@@ -19,7 +19,7 @@ func testKVStore(t *testing.T, kv KVStore) {
 	assert.Equal(Value("Alexandre"), v)
 
 	v, err = kv.Get(Key("unknown_key"))
-	assert.Equal(errKeyNotFound, err, kvType)
+	assert.Equal(ErrKeyNotFound, err, kvType)
 }
 
 func TestKVMapStore(t *testing.T) {

@@ -15,7 +15,7 @@ func NewKVMapStore() *KVMapStore {
 // Set adds or replaces the key / value pair in the map
 func (kvms *KVMapStore) Set(key Key, value Value) error {
 	if len(key) == 0 {
-		return errKeyEmpty
+		return ErrKeyEmpty
 	}
 	kvms.store[string(key)] = value
 	return nil
@@ -25,7 +25,7 @@ func (kvms *KVMapStore) Set(key Key, value Value) error {
 func (kvms *KVMapStore) Get(key Key) (Value, error) {
 	value, found := kvms.store[string(key)]
 	if !found {
-		return Value(""), errKeyNotFound
+		return Value(""), ErrKeyNotFound
 	}
 	return value, nil
 }
@@ -34,7 +34,7 @@ func (kvms *KVMapStore) Get(key Key) (Value, error) {
 func (kvms KVMapStore) Delete(key Key) error {
 	_, found := kvms.store[string(key)]
 	if !found {
-		return errKeyNotFound
+		return ErrKeyNotFound
 	}
 	delete(kvms.store, string(key))
 	return nil

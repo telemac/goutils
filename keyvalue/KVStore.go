@@ -3,8 +3,10 @@ package keyvalue
 import "errors"
 
 var (
-	errKeyEmpty    = errors.New("key is empty")
-	errKeyNotFound = errors.New("key not found")
+	// ErrKeyEmpty key is empty error
+	ErrKeyEmpty = errors.New("key is empty")
+	// ErrKeyNotFound key not found error
+	ErrKeyNotFound = errors.New("key not found")
 )
 
 // Key is the type for a key
