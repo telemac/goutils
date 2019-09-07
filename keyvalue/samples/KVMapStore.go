@@ -12,11 +12,13 @@ func main() {
 
 	// Create a kv store
 	kv := keyvalue.NewKVMapStore()
-	kv.Set(keyvalue.Key("name"), keyvalue.Value("Alexandre"))
+	err := kv.Set(keyvalue.Key("name"), keyvalue.Value("Alexandre"))
+	if err != nil {
+		log.Fatalf("Unable to set key %s", "name")
+	}
 	name, err := kv.Get(keyvalue.Key("name"))
 	if err == keyvalue.ErrKeyNotFound {
 		log.Fatalf("key %s not found", "name")
 	}
 	log.Printf("name is %s", name)
-
 }

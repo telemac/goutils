@@ -1,4 +1,4 @@
-package keyvalue
+package keyvalue // import github.com/telemac/goutils/keyvalue
 
 import "errors"
 

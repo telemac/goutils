@@ -16,9 +16,10 @@ func testKVStore(t *testing.T, kv KVStore) {
 	assert.Nil(err, kvType)
 
 	v, err := kv.Get(Key("name"))
+	assert.NoError(err)
 	assert.Equal(Value("Alexandre"), v)
 
-	v, err = kv.Get(Key("unknown_key"))
+	_, err = kv.Get(Key("unknown_key"))
 	assert.Equal(ErrKeyNotFound, err, kvType)
 }
 

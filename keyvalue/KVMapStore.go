@@ -1,4 +1,4 @@
-package keyvalue
+package keyvalue // import github.com/telemac/goutils/keyvalue
 
 // KVMapStore implements a non thread safe KVStore based on go maps
 type KVMapStore struct {
