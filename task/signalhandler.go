@@ -3,9 +3,11 @@ package task
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 // SignalHandler allows to cancel a cancellable context on os interrupt signal reception
@@ -14,10 +16,12 @@ type SignalHandler struct {
 }
 
 // Run takes a context and a context.CancelFunc as second parameter.
+// if the third parameter is a time.Duration, the program forces exit after that timeout
 // Wned the process receives an interrupt signal, the cancel function is called.
-// Run is non blocking, it creates a goroutine to catch
+// Run is non blocking, it creates a goroutine to catch interrupt signal
 func (sh *SignalHandler) Run(ctx context.Context, params ...interface{}) error {
-	if len(params) != 1 {
+	// get first parameter, the cancel fund
+	if len(params) < 1 {
 		return errors.New("must have one argument")
 	}
 	var ok bool
@@ -26,12 +30,28 @@ func (sh *SignalHandler) Run(ctx context.Context, params ...interface{}) error {
 		return errors.New("first argument must be of type context.CancelFunc")
 	}
 
+	// get second parameter, the delay before forced exit
+	var delayBeforeForcedExit time.Duration
+	if len(params) >= 2 {
+		delay, ok := params[1].(time.Duration)
+		if ok {
+			delayBeforeForcedExit = delay
+		}
+	}
+
 	signaled := make(chan os.Signal, 1)
 	signal.Notify(signaled, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		defer sh.cancelFunc()
 		select {
 		case <-signaled:
+			if delayBeforeForcedExit > 0 {
+				go func() {
+					time.Sleep(delayBeforeForcedExit)
+					fmt.Printf("\nForce exit after %s\n", delayBeforeForcedExit.String())
+					os.Exit(1)
+				}()
+			}
 		case <-ctx.Done():
 		}
 	}()
