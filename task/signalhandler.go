@@ -57,3 +57,18 @@ func (sh *SignalHandler) Run(ctx context.Context, params ...interface{}) error {
 	}()
 	return nil
 }
+
+// NewCancellableContext creates a cancellable context that handles interrupt events
+// timeout is the time after which the process will exit if not terminated after the context is cancelled
+func NewCancellableContext(timeout time.Duration) (ctx context.Context, cancel context.CancelFunc) {
+	ctx, cancel = context.WithCancel(context.Background())
+
+	// Handle interrupt signal
+	var signalHandler SignalHandler
+	err := signalHandler.Run(ctx, cancel, timeout)
+	if err != nil {
+		panic(err) // never happens, normally
+	}
+
+	return ctx,cancel
+}
