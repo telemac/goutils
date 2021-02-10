@@ -214,3 +214,19 @@ func (t *NatsTransport) RegisterHandler(eventHandler CloudEventHandler, topic st
 
 	return nil
 }
+
+var contextKey struct{}
+
+// WithTransport adds the transport as context value
+func WithTransport(ctx context.Context, transport *NatsTransport) context.Context {
+	return context.WithValue(ctx, contextKey, transport)
+}
+
+// FromContext returns the transport set with WithTransport or nil
+func FromContext(ctx context.Context) *NatsTransport {
+	transport, ok := ctx.Value(contextKey).(*NatsTransport)
+	if !ok {
+		return nil
+	}
+	return transport
+}

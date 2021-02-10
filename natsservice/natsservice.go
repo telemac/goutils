@@ -2,14 +2,39 @@ package natsservice
 
 import (
 	"github.com/sirupsen/logrus"
+	"github.com/telemac/goutils/logger"
 	"github.com/telemac/goutils/natsevents"
 	"github.com/telemac/goutils/task"
 )
 
-type NatsService struct {
-	logger *logrus.Entry
-	transport natsevents.Transport // cloudEvent transport, allows to send and receive cloud events over nats
+type NatsServiceIntf interface {
 	task.Runnable
+	logger.Logger
+	natsevents.Transporter
+}
+
+type NatsService struct {
+	logger    *logrus.Entry
+	transport natsevents.Transport // cloudEvent transport, allows to send and receive cloud events over nats
+	NatsServiceIntf
+}
+
+// implement Logger
+func (ns *NatsService) Logger() *logrus.Entry {
+	return ns.logger
+}
+
+func (ns *NatsService) SetLogger(logger *logrus.Entry) {
+	ns.logger = logger
+}
+
+// implement Transporter
+func (ns *NatsService) Transport() natsevents.Transport {
+	return ns.transport
+}
+
+func (ns *NatsService) SetTransport(transport natsevents.Transport) {
+	ns.transport = transport
 }
 
 // NewNatsService creates a nats service

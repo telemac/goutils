@@ -7,6 +7,11 @@ import (
 
 var contextKey struct{} // context key
 
+type Logger interface {
+	Logger() *logrus.Entry
+	SetLogger(logger *logrus.Entry)
+}
+
 // New creates a new loggger
 func New(level string, fields ...logrus.Fields) *logrus.Entry {
 	logger := logrus.New()

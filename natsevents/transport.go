@@ -9,3 +9,8 @@ type Transport interface {
 	CloudEventReceiver
 	io.Closer
 }
+
+type Transporter interface {
+	Transport() Transport
+	SetTransport(transport Transport)
+}
