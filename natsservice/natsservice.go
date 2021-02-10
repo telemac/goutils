@@ -21,6 +21,9 @@ type NatsService struct {
 
 // implement Logger
 func (ns *NatsService) Logger() *logrus.Entry {
+	if ns.logger == nil {
+		panic("logger not set in NatsService")
+	}
 	return ns.logger
 }
 
@@ -30,6 +33,9 @@ func (ns *NatsService) SetLogger(logger *logrus.Entry) {
 
 // implement Transporter
 func (ns *NatsService) Transport() natsevents.Transport {
+	if ns.transport == nil {
+		panic("logger not set in NatsService")
+	}
 	return ns.transport
 }
 
