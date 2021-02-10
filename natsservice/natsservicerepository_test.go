@@ -63,9 +63,6 @@ func TestNewNatsServiceRepository(t *testing.T) {
 	assert.NoError(err)
 
 	svcSample := new(NatsServiceSample)
-	// TODO : find a way to transfer logger and transport from repository to NatsService
-	svcSample.logger = natsSvcRepo.logger
-	svcSample.transport = natsSvcRepo.transport
 
 	natsSvcRepo.Start(ctx, svcSample, 3)
 	natsSvcRepo.Start(ctx, svcSample, 5)
