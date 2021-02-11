@@ -174,10 +174,10 @@ func (t *NatsTransport) onNatsMessage(msg *nats.Msg) {
 		err := event.UnmarshalJSON(msg.Data)
 		if err != nil {
 			// call event handler with raw payload
-			event, err = s.cloudEventHandler(msg.Subject, nil, msg.Data)
+			event, err = s.cloudEventHandler(msg.Subject, nil, msg.Data, err)
 		} else {
 			// call with decoded event
-			event, err = s.cloudEventHandler(msg.Subject, event, nil)
+			event, err = s.cloudEventHandler(msg.Subject, event, nil, nil)
 		}
 		// TODO : check if it is a request response
 		if msg.Reply != "" {

@@ -30,7 +30,7 @@ func TestNewNatsTransport(t *testing.T) {
 	assert.NoError(err)
 	assert.True(transport.Connected())
 
-	eventHandler := func(topic string, event *event.Event, payload []byte) (*event.Event, error) {
+	eventHandler := func(topic string, event *event.Event, payload []byte, err error) (*event.Event, error) {
 		//logrus.Printf("eventHandler callback topic = %s event = %s", topic, event)
 		if event == nil {
 			logrus.Fatal("event is nil in event handler")
@@ -125,7 +125,7 @@ func TestNatsTransport_Request(t *testing.T) {
 	assert.True(errors.Is(err, nats.ErrTimeout))
 
 	// add handler
-	requestHandler := func(topic string, event *event.Event, payload []byte) (*event.Event, error) {
+	requestHandler := func(topic string, event *event.Event, payload []byte, err error) (*event.Event, error) {
 		//logrus.Printf("eventHandler callback topic = %s ce = %s", topic, ce)
 		if event == nil {
 			logrus.Fatal("ce is nil in ce handler")
