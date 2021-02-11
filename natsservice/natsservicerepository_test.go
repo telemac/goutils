@@ -69,6 +69,6 @@ func TestNewNatsServiceRepository(t *testing.T) {
 
 	natsSvcRepo.WaitUntilAllDone()
 
-	err = natsSvcRepo.Close()
+	err = natsSvcRepo.Close(time.Second * 3)
 	assert.NoError(err)
 }

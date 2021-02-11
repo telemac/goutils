@@ -7,6 +7,7 @@ import (
 	"github.com/telemac/goutils/logger"
 	"github.com/telemac/goutils/natsevents"
 	"github.com/telemac/goutils/task"
+	"time"
 )
 
 // NatsServiceRepository provides logging nats cloud events transport for multiple services
@@ -38,7 +39,10 @@ func NewNatsServiceRepository(name string, natsServers string, logLevel string) 
 	return nsr, nil
 }
 
-func (nsr *NatsServiceRepository) Close() error {
+func (nsr *NatsServiceRepository) Close(timeout time.Duration) error {
+	if timeout > 0 {
+		_ = nsr.transport.Flush(timeout)
+	}
 	return nsr.transport.Close()
 }
 
