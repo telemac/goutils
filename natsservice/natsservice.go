@@ -34,7 +34,10 @@ func (ns *NatsService) SetLogger(logger *logrus.Entry) {
 // implement Transporter
 func (ns *NatsService) Transport() natsevents.Transport {
 	if ns.transport == nil {
-		panic("logger not set in NatsService")
+		if ns.Logger() != nil {
+			ns.Logger().Error("transport not set in NatsService")
+		}
+		panic("transport not set in NatsService")
 	}
 	return ns.transport
 }

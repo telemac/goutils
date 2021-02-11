@@ -39,9 +39,9 @@ func (svc *NatsServiceSample) Run(ctx context.Context, params ...interface{}) er
 			ce.SetID(uuid.New().String())
 			ce.SetTime(time.Now())
 			ce.SetData(cloudevents.ApplicationJSON, data)
-			err := svc.transport.Send(ctx, ce, "com.plugis.test."+reflect.TypeOf(svc).String())
+			err := svc.Transport().Send(ctx, ce, "com.plugis.test."+reflect.TypeOf(svc).String())
 			if err != nil {
-				svc.logger.WithError(err).Error("transport.Send")
+				svc.Logger().WithError(err).Error("transport.Send")
 			}
 			if count == maxCount {
 				return nil
