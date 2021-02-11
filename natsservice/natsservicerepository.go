@@ -13,6 +13,7 @@ import (
 // NatsServiceRepository provides logging nats cloud events transport for multiple services
 type NatsServiceRepository struct {
 	task.RunnerRepository
+	natsevents.Transporter
 	name        string
 	natsServers string
 	logLevel    string
@@ -39,6 +40,7 @@ func NewNatsServiceRepository(name string, natsServers string, logLevel string) 
 	return nsr, nil
 }
 
+// Close closes flushes events on nats if timeout > 0 and closes nats connection
 func (nsr *NatsServiceRepository) Close(timeout time.Duration) error {
 	if timeout > 0 {
 		_ = nsr.transport.Flush(timeout)
@@ -46,8 +48,14 @@ func (nsr *NatsServiceRepository) Close(timeout time.Duration) error {
 	return nsr.transport.Close()
 }
 
+// Start creates a go routine and runs natsSvc Run function
 func (nsr *NatsServiceRepository) Start(ctx context.Context, natsSvc NatsServiceIntf, params ...interface{}) *task.Task {
 	natsSvc.SetLogger(nsr.logger)
 	natsSvc.SetTransport(nsr.transport)
 	return nsr.RunnerRepository.Start(ctx, natsSvc, params...)
+}
+
+// Logger the logger for the service repository
+func (nsr *NatsServiceRepository) Logger() *logrus.Entry {
+	return nsr.logger
 }
