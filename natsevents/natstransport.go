@@ -153,7 +153,10 @@ func (t *NatsTransport) Request(ctx context.Context, event event.Event, topic st
 	if err != nil {
 		return nil, err
 	}
-	// TODO : check enpty payload response
+	// receive a valid cloud event, or an enpty payload
+	if len(msg.Data) == 0 {
+		return nil, nil
+	}
 	var responseEvent = new(cloudevents.Event)
 	err = responseEvent.UnmarshalJSON(msg.Data)
 	if err != nil {
@@ -181,15 +184,22 @@ func (t *NatsTransport) onNatsMessage(msg *nats.Msg) {
 		}
 		// TODO : check if it is a request response
 		if msg.Reply != "" {
-			payload, err := event.MarshalJSON()
-			if err != nil {
-				// TODO : handle json format errors here
+			var payload []byte
+			if event != nil {
+				payload, err = event.MarshalJSON()
+				if err != nil {
+					// TODO : handle json format errors here
+				}
 			}
-			msg.Respond(payload)
+			err = msg.Respond(payload)
+			if err != nil {
+				// TODO : find a way to report errors in onNatsMessage fn
+			}
 		}
 	} else {
 		// TODO : message not corresponding a previous subscription, notify ?
 	}
+
 }
 
 func (t *NatsTransport) RegisterHandler(eventHandler CloudEventHandler, topic string) error {
