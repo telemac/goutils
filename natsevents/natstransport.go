@@ -5,6 +5,7 @@ import (
 	"errors"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/cloudevents/sdk-go/v2/event"
+	"github.com/google/uuid"
 	"github.com/jimlawless/whereami"
 	"github.com/nats-io/nats.go"
 	log "github.com/sirupsen/logrus"
@@ -182,9 +183,12 @@ func (t *NatsTransport) onNatsMessage(msg *nats.Msg) {
 			// call with decoded event
 			event, err = s.cloudEventHandler(msg.Subject, event, nil, nil)
 		}
-		// TODO : check if it is a request response
+
 		if msg.Reply != "" {
 			var payload []byte
+			if err != nil {
+				// TODO : handle cloudEventHandler error!=nil
+			}
 			if event != nil {
 				payload, err = event.MarshalJSON()
 				if err != nil {
@@ -239,4 +243,14 @@ func FromContext(ctx context.Context) *NatsTransport {
 		return nil
 	}
 	return transport
+}
+
+// NewEvent creates a cloud event given minimal parameters
+func (t *NatsTransport) NewEvent(eventType string, obj interface{}) event.Event {
+	e := event.New(event.CloudEventsVersionV1)
+	e.SetType(eventType)
+	e.SetData(event.ApplicationJSON, obj)
+	e.SetTime(time.Now())
+	e.SetID(uuid.NewString())
+	return e
 }
