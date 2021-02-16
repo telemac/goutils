@@ -9,6 +9,7 @@ import (
 	"github.com/jimlawless/whereami"
 	"github.com/nats-io/nats.go"
 	log "github.com/sirupsen/logrus"
+	"reflect"
 	"sync"
 	"time"
 )
@@ -246,9 +247,13 @@ func FromContext(ctx context.Context) *NatsTransport {
 }
 
 // NewEvent creates a cloud event given minimal parameters
-func (t *NatsTransport) NewEvent(eventType string, obj interface{}) event.Event {
+func (t *NatsTransport) NewEvent(eventPrefix, eventType string, obj interface{}) event.Event {
 	e := event.New(event.CloudEventsVersionV1)
-	e.SetType(eventType)
+	if eventType != "" {
+		e.SetType(eventPrefix + eventType)
+	} else {
+		e.SetType(eventPrefix + reflect.TypeOf(obj).String())
+	}
 	e.SetData(event.ApplicationJSON, obj)
 	e.SetTime(time.Now())
 	e.SetID(uuid.NewString())

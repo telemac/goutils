@@ -12,5 +12,5 @@ type CloudEventSender interface {
 	Flush(timeout time.Duration) error
 	Send(ctx context.Context, event event.Event, topic string) error
 	Request(ctx context.Context, event event.Event, topic string, timeout time.Duration) (*event.Event, error)
-	NewEvent(eventType string, obj interface{}) event.Event
+	NewEvent(eventPrefix, eventType string, obj interface{}) event.Event
 }
