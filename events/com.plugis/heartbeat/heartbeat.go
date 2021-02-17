@@ -2,6 +2,7 @@ package heartbeat
 
 import (
 	"context"
+	"math/rand"
 	"time"
 
 	"github.com/telemac/goutils/natsservice"
@@ -19,10 +20,8 @@ func (svc *HeartbeatService) SendHeartbeatEvent(ctx context.Context) error {
 	t := svc.Transport()
 	var err error
 
-	svc.sentEvent, err = NewSent()
-	if err != nil {
-		svc.Logger().WithError(err).Errorf("create heartbeat.Sent event")
-	}
+	// TODO : update event
+	svc.sentEvent.Uptime = uint64(time.Since(svc.sentEvent.Started).Seconds())
 
 	heartbeatEvent := t.NewEvent("com.plugis.", "", svc.sentEvent)
 	err = t.Send(ctx, heartbeatEvent, heartbeatEvent.Type()+"."+svc.sentEvent.Mac)
@@ -36,9 +35,19 @@ func (svc *HeartbeatService) Run(ctx context.Context, params ...interface{}) err
 	svc.Logger().Debug("heartbeat service started")
 	defer svc.Logger().Debug("heartbeat service ended")
 
+	var err error
+
+	svc.sentEvent, err = NewSent()
+	if err != nil {
+		svc.Logger().WithError(err).Errorf("create heartbeat.Sent event")
+		return err
+	}
+
 	for {
 		_ = svc.SendHeartbeatEvent(ctx)
-		interrupted := task.Sleep(ctx, time.Second*time.Duration(svc.Period))
+
+		waitTime := time.Second * time.Duration(svc.Period+rand.Intn(svc.RandomPeriod))
+		interrupted := task.Sleep(ctx, waitTime)
 		if interrupted {
 			//ctx2, _ := context.WithTimeout(context.TODO(), time.Second*5)
 			return svc.SendHeartbeatEvent(ctx)

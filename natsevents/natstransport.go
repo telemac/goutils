@@ -10,6 +10,7 @@ import (
 	"github.com/nats-io/nats.go"
 	log "github.com/sirupsen/logrus"
 	"reflect"
+	"strings"
 	"sync"
 	"time"
 )
@@ -252,7 +253,11 @@ func (t *NatsTransport) NewEvent(eventPrefix, eventType string, obj interface{})
 	if eventType != "" {
 		e.SetType(eventPrefix + eventType)
 	} else {
-		e.SetType(eventPrefix + reflect.TypeOf(obj).String())
+		objType := reflect.TypeOf(obj).String()
+		if strings.HasPrefix(objType, "*") {
+			objType = objType[1:]
+		}
+		e.SetType(eventPrefix + objType)
 	}
 	e.SetData(event.ApplicationJSON, obj)
 	e.SetTime(time.Now())

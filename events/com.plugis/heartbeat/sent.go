@@ -10,25 +10,26 @@ import (
 type Sent struct {
 	Mac        string    `json:"mac"`
 	InternalIP string    `json:"ip"`
-	Started    time.Time `json:"started"`
+	Started    time.Time `json:"started,omitempty"`
+	Uptime     uint64    `json:"uptime,omitempty"`
 }
 
 // NewSent creates a new sent event
 func NewSent() (*Sent, error) {
 	// get external ip
-	externelIP, err := net.GetOutboundIP()
+	internalIP, err := net.GetOutboundIP()
 	if err != nil {
-		fmt.Errorf("get outbound ip :%w", err)
+		return nil, fmt.Errorf("get outbound ip :%w", err)
 	}
 
 	macAddress, err := net.GetMACAddress()
 	if err != nil {
-		fmt.Errorf("get mac address :%w", err)
+		return nil, fmt.Errorf("get mac address :%w", err)
 	}
 
 	return &Sent{
 		Mac:        macAddress,
-		InternalIP: externelIP,
+		InternalIP: internalIP,
 		Started:    time.Now(),
 	}, nil
 }
