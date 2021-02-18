@@ -3,6 +3,7 @@ package net
 import (
 	"errors"
 	"net"
+	"strings"
 )
 
 type networkInterface struct {
@@ -51,5 +52,5 @@ func GetMACAddress() (string, error) {
 	if len(NetworkInterfaces) == 0 {
 		return "", errors.New("GetMACAddress: no interface detected")
 	}
-	return NetworkInterfaces[0].MAC, nil
+	return strings.ToUpper(NetworkInterfaces[0].MAC), nil
 }
