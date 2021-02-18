@@ -2,6 +2,7 @@ package heartbeat
 
 import (
 	"context"
+	"github.com/sirupsen/logrus"
 	"math/rand"
 	"reflect"
 	"time"
@@ -15,6 +16,10 @@ type HeartbeatSender struct {
 	Period        int
 	RandomPeriod  int
 	sentEventData *Sent
+}
+
+func (svc *HeartbeatSender) Logger() *logrus.Entry {
+	return svc.NatsService.Logger().WithField("nats-service", reflect.TypeOf(*svc).String())
 }
 
 func (svc *HeartbeatSender) SendHeartbeatEvent(ctx context.Context) error {
@@ -33,13 +38,13 @@ func (svc *HeartbeatSender) SendHeartbeatEvent(ctx context.Context) error {
 }
 
 func (svc *HeartbeatSender) Run(ctx context.Context, params ...interface{}) error {
-	log := svc.Logger().WithField("type", reflect.TypeOf(svc).String())
-	log.Debug("heartbeat service started")
-	defer log.Debug("heartbeat service ended")
+	log := svc.Logger()
+	log.Debug("heartbeat sender started")
+	defer log.Debug("heartbeat sender ended")
 
 	var err error
 
-	svc.sentEventData, err = NewSent()
+	svc.sentEventData, err = NewSent(reflect.TypeOf(*svc).String())
 	if err != nil {
 		log.WithError(err).Errorf("create heartbeat.Sent event")
 		return err
