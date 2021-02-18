@@ -3,6 +3,7 @@ package heartbeat
 import (
 	"context"
 	"math/rand"
+	"reflect"
 	"time"
 
 	"github.com/telemac/goutils/natsservice"
@@ -11,20 +12,20 @@ import (
 
 type HeartbeatService struct {
 	natsservice.NatsService
-	Period       int
-	RandomPeriod int
-	sentEvent    *Sent
+	Period        int
+	RandomPeriod  int
+	sentEventData *Sent
 }
 
 func (svc *HeartbeatService) SendHeartbeatEvent(ctx context.Context) error {
 	t := svc.Transport()
 	var err error
 
-	// TODO : update event
-	svc.sentEvent.Uptime = uint64(time.Since(svc.sentEvent.Started).Seconds())
+	// update event data field
+	svc.sentEventData.Uptime = uint64(time.Since(svc.sentEventData.Started).Seconds())
 
-	heartbeatEvent := t.NewEvent("com.plugis.", "", svc.sentEvent)
-	err = t.Send(ctx, heartbeatEvent, heartbeatEvent.Type()+"."+svc.sentEvent.Mac)
+	heartbeatEvent := t.NewEvent("com.plugis.", "", svc.sentEventData)
+	err = t.Send(ctx, heartbeatEvent, heartbeatEvent.Type()+"."+svc.sentEventData.Mac)
 	if err != nil {
 		svc.Logger().WithError(err).WithField("heartbeat-event", heartbeatEvent).Warn("send heartbeat cloud event")
 	}
@@ -32,14 +33,15 @@ func (svc *HeartbeatService) SendHeartbeatEvent(ctx context.Context) error {
 }
 
 func (svc *HeartbeatService) Run(ctx context.Context, params ...interface{}) error {
-	svc.Logger().Debug("heartbeat service started")
-	defer svc.Logger().Debug("heartbeat service ended")
+	log := svc.Logger().WithField("type", reflect.TypeOf(svc).String())
+	log.Debug("heartbeat service started")
+	defer log.Debug("heartbeat service ended")
 
 	var err error
 
-	svc.sentEvent, err = NewSent()
+	svc.sentEventData, err = NewSent()
 	if err != nil {
-		svc.Logger().WithError(err).Errorf("create heartbeat.Sent event")
+		log.WithError(err).Errorf("create heartbeat.Sent event")
 		return err
 	}
 

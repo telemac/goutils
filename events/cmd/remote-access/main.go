@@ -23,8 +23,8 @@ func main() {
 
 	// start heartbeat service
 	servicesRepository.Start(ctx, &heartbeat.HeartbeatService{
-		Period:       56,
-		RandomPeriod: 3,
+		Period:       55,
+		RandomPeriod: 4,
 	})
 
 	// start shell service
