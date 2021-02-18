@@ -22,7 +22,7 @@ func main() {
 	servicesRepository.Logger().Info("remote-access service starting")
 
 	// start heartbeat service
-	servicesRepository.Start(ctx, &heartbeat.HeartbeatService{
+	servicesRepository.Start(ctx, &heartbeat.HeartbeatSender{
 		Period:       55,
 		RandomPeriod: 4,
 	})

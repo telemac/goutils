@@ -10,14 +10,14 @@ import (
 	"github.com/telemac/goutils/task"
 )
 
-type HeartbeatService struct {
+type HeartbeatSender struct {
 	natsservice.NatsService
 	Period        int
 	RandomPeriod  int
 	sentEventData *Sent
 }
 
-func (svc *HeartbeatService) SendHeartbeatEvent(ctx context.Context) error {
+func (svc *HeartbeatSender) SendHeartbeatEvent(ctx context.Context) error {
 	t := svc.Transport()
 	var err error
 
@@ -32,7 +32,7 @@ func (svc *HeartbeatService) SendHeartbeatEvent(ctx context.Context) error {
 	return err
 }
 
-func (svc *HeartbeatService) Run(ctx context.Context, params ...interface{}) error {
+func (svc *HeartbeatSender) Run(ctx context.Context, params ...interface{}) error {
 	log := svc.Logger().WithField("type", reflect.TypeOf(svc).String())
 	log.Debug("heartbeat service started")
 	defer log.Debug("heartbeat service ended")
