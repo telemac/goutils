@@ -3,3 +3,4 @@ build.sh
 /remote-access.exe
 /remote-access_darwin
 /remote-access_linux
+/remote-access_arm
