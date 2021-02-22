@@ -32,7 +32,7 @@ func NewNatsServiceRepository(name string, natsServers string, logLevel string) 
 
 	// Create nats transport for cloud events
 	var err error
-	nsr.transport, err = natsevents.NewNatsTransport("https://nats1.plugis.com")
+	nsr.transport, err = natsevents.NewNatsTransport(natsServers)
 	if err != nil {
 		return &NatsServiceRepository{}, fmt.Errorf("create nate transport : %w", err)
 	}
@@ -63,4 +63,9 @@ func (nsr *NatsServiceRepository) Logger() *logrus.Entry {
 // Transport returns the transport for the service repository
 func (nsr *NatsServiceRepository) Transport() natsevents.Transport {
 	return nsr.transport
+}
+
+// Name returns the name given in NewNatsTransport
+func (nsr *NatsServiceRepository) Name() string {
+	return nsr.name
 }
