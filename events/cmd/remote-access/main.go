@@ -4,6 +4,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/telemac/goutils/events/com.plugis/browser"
 	"github.com/telemac/goutils/events/com.plugis/heartbeat"
+	"github.com/telemac/goutils/events/com.plugis/service"
 	"github.com/telemac/goutils/events/com.plugis/shell"
 	"github.com/telemac/goutils/natsservice"
 	"github.com/telemac/goutils/task"
@@ -21,6 +22,11 @@ func main() {
 	defer servicesRepository.Close(time.Second * 10)
 
 	servicesRepository.Logger().Info("remote-access service starting")
+
+	// auto install service
+	servicesRepository.Start(ctx, &service.SelfInstallService{
+		ServiceName: "remote-access",
+	})
 
 	// start heartbeat service
 	servicesRepository.Start(ctx, &heartbeat.HeartbeatSender{
