@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/telemac/goutils/net"
 	"os/exec"
 
 	"github.com/cloudevents/sdk-go/v2/event"
@@ -52,7 +53,7 @@ func (svc *ShellService) eventHandler(topic string, receivedEvent *event.Event, 
 			cmd = exec.Command(params.Command[0], params.Command[1:]...)
 		}
 
-		params.Command = append([]string{"sh", "-c"}, params.Command...)
+		//params.Command = append([]string{"sh", "-c"}, params.Command...)
 
 		out, err := cmd.CombinedOutput()
 		params.Response, params.Error = string(out), err
@@ -85,9 +86,14 @@ func (svc ShellService) Run(ctx context.Context, params ...interface{}) error {
 	var err error
 
 	// register eventHandler for event reception
-	err = svc.Transport().RegisterHandler(svc.eventHandler, "com.plugis.shell")
+	mac, err := net.GetMACAddress()
 	if err != nil {
-		svc.Logger().WithError(err).Error("failed to register event handler")
+		svc.Logger().WithError(err).Error("get mad accress")
+	}
+	topic := "com.plugis.shell." + mac
+	err = svc.Transport().RegisterHandler(svc.eventHandler, topic)
+	if err != nil {
+		svc.Logger().WithError(err).Error("register event handler")
 		return err
 	}
 
