@@ -8,6 +8,7 @@ type EventSenderConfig struct {
 	EventType string
 	EventData string
 	Topic     string
+	Request   bool
 }
 
 func (c *EventSenderConfig) Parse() {
@@ -16,5 +17,6 @@ func (c *EventSenderConfig) Parse() {
 	flag.StringVar(&c.EventType, "type", "com.plugis.browser.open", "cloud event type")
 	flag.StringVar(&c.EventData, "data", `{"url":"https://google.fr"}`, "cloud event data in json format")
 	flag.StringVar(&c.Topic, "topic", `com.plugis.browser`, "topic to send the event")
+	flag.BoolVar(&c.Request, "request", false, "send request")
 	flag.Parse()
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/sirupsen/logrus"
 	"github.com/telemac/goutils/events/cmd/event-sender/config"
 	"github.com/telemac/goutils/natsservice"
@@ -36,9 +37,19 @@ func main() {
 
 	cloudEvent := servicesRepository.Transport().NewEvent("", eventType, obj)
 
-	err = servicesRepository.Transport().Send(ctx, cloudEvent, topic)
-	if err != nil {
-		servicesRepository.Logger().WithError(err).WithField("event-type", eventType).Warn("send cloud event")
+	if params.Request {
+		ev, err := servicesRepository.Transport().Request(ctx, cloudEvent, topic, time.Second*60)
+		_ = ev
+		if err != nil {
+			servicesRepository.Logger().WithError(err).WithField("event-type", eventType).Warn("request cloud event")
+		} else {
+			fmt.Printf("ev = %+v", ev)
+		}
+	} else {
+		err = servicesRepository.Transport().Send(ctx, cloudEvent, topic)
+		if err != nil {
+			servicesRepository.Logger().WithError(err).WithField("event-type", eventType).Warn("send cloud event")
+		}
 	}
 
 }
