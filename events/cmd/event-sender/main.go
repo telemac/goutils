@@ -11,11 +11,11 @@ import (
 )
 
 func main() {
-	ctx, cancel := task.NewCancellableContext(time.Second * 15)
-	defer cancel()
-
 	var params config.EventSenderConfig
 	params.Parse()
+
+	ctx, cancel := task.NewCancellableContext(time.Second * 5)
+	defer cancel()
 
 	servicesRepository, err := natsservice.NewNatsServiceRepository("event-sender", params.Server, params.LogLevel)
 	if err != nil {
@@ -38,8 +38,9 @@ func main() {
 	cloudEvent := servicesRepository.Transport().NewEvent("", eventType, obj)
 
 	if params.Request {
-		ev, err := servicesRepository.Transport().Request(ctx, cloudEvent, topic, time.Second*60)
+		ev, err := servicesRepository.Transport().Request(ctx, cloudEvent, topic, time.Second*time.Duration(params.Timeout))
 		_ = ev
+		fmt.Printf("err=%v, ev = %+v", err, ev)
 		if err != nil {
 			servicesRepository.Logger().WithError(err).WithField("event-type", eventType).Warn("request cloud event")
 		} else {

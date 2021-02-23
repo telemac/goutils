@@ -9,6 +9,7 @@ type EventSenderConfig struct {
 	EventData string
 	Topic     string
 	Request   bool
+	Timeout   int
 }
 
 func (c *EventSenderConfig) Parse() {
@@ -18,5 +19,6 @@ func (c *EventSenderConfig) Parse() {
 	flag.StringVar(&c.EventData, "data", `{"url":"https://google.fr"}`, "cloud event data in json format")
 	flag.StringVar(&c.Topic, "topic", `com.plugis.browser`, "topic to send the event")
 	flag.BoolVar(&c.Request, "request", false, "send request")
+	flag.IntVar(&c.Timeout, "timeout", 60, "timeout")
 	flag.Parse()
 }
