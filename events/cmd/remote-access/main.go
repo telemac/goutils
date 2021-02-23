@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/sirupsen/logrus"
+	"github.com/telemac/goutils/events/com.plugis/browser"
 	"github.com/telemac/goutils/events/com.plugis/heartbeat"
 	"github.com/telemac/goutils/events/com.plugis/shell"
 	"github.com/telemac/goutils/natsservice"
@@ -29,6 +30,9 @@ func main() {
 
 	// start shell service
 	servicesRepository.Start(ctx, &shell.ShellService{})
+
+	// browser service
+	servicesRepository.Start(ctx, &browser.BrowserService{})
 
 	servicesRepository.WaitUntilAllDone()
 
