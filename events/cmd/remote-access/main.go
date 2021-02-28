@@ -15,7 +15,8 @@ func main() {
 	ctx, cancel := task.NewCancellableContext(time.Second * 15)
 	defer cancel()
 
-	servicesRepository, err := natsservice.NewNatsServiceRepository("remote-access", "https://nats1.plugis.com", "trace")
+	//servicesRepository, err := natsservice.NewNatsServiceRepository("remote-access", "https://nats1.plugis.com", "trace")
+	servicesRepository, err := natsservice.NewNatsServiceRepository("remote-access", "nats://cloud1.idronebox.com:443", "trace")
 	if err != nil {
 		logrus.WithError(err).Fatal("create nats service repository")
 	}

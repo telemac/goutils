@@ -2,6 +2,7 @@ package natsevents
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/cloudevents/sdk-go/v2/event"
@@ -9,6 +10,8 @@ import (
 	"github.com/jimlawless/whereami"
 	"github.com/nats-io/nats.go"
 	log "github.com/sirupsen/logrus"
+	"net"
+	"net/url"
 	"reflect"
 	"strings"
 	"sync"
@@ -72,11 +75,37 @@ func (t *NatsTransport) Connected() bool {
 	return t.nc.IsConnected()
 }
 
+func SNI(serverName string) nats.Option {
+	return func(o *nats.Options) error {
+		if o.TLSConfig == nil {
+			o.TLSConfig = &tls.Config{
+				MinVersion: tls.VersionTLS12,
+				ServerName: serverName,
+			}
+		}
+		o.Secure = false
+		return nil
+	}
+}
+
+type SNIDialer struct {
+	ServerName string
+}
+
+func (d *SNIDialer) Dial(network, address string) (net.Conn, error) {
+	conn, err := tls.Dial(network, address, &tls.Config{
+		ServerName:         d.ServerName,
+		InsecureSkipVerify: true,
+		MinVersion:         tls.VersionTLS12,
+	})
+	return conn, err
+}
+
 // NewNatsTransport connects to nats and creates a NatsTransport
-func NewNatsTransport(servers string) (*NatsTransport, error) {
+func NewNatsTransport(server string) (*NatsTransport, error) {
 	var err error
 	transport := &NatsTransport{
-		servers:       servers,
+		servers:       server,
 		subscriptions: make(map[string]*natsSubscription),
 	}
 
@@ -88,9 +117,24 @@ func NewNatsTransport(servers string) (*NatsTransport, error) {
 		nats.ErrorHandler(transport.errorHandler),
 		nats.MaxReconnects(-1),
 		nats.DrainTimeout(30 * time.Second),
+
+		//nats.Name("cloud1.idronebox.com"),
+
 	}
 
-	transport.nc, err = nats.Connect(servers, opts...)
+	// get host name
+	u, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+	hostname := u.Hostname()
+
+	// TODO : find a solution for SNI with multiple servers, may be it must be implemented in nats
+	if strings.Contains(server, "nats://") && strings.Contains(server, ":443") {
+		opts = append(opts, nats.SetCustomDialer(&SNIDialer{ServerName: hostname}), SNI(hostname))
+	}
+
+	transport.nc, err = nats.Connect(server, opts...)
 
 	return transport, err
 }

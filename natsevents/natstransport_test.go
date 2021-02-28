@@ -25,8 +25,12 @@ func TestNewNatsTransport(t *testing.T) {
 	logrus.SetLevel(logrus.TraceLevel)
 	assert := assert.New(t)
 	//transport, err := NewNatsTransport("localhost")
-	transport, err := NewNatsTransport("https://nats1.plugis.com")
-	//transport, err := NewNatsTransport("https://demo.nats.io")
+	var transport *NatsTransport
+	var err error
+	transport, err = NewNatsTransport("nats://cloud1.idronebox.com:443")
+	assert.NoError(err)
+	assert.True(transport.Connected())
+	transport, err = NewNatsTransport("nats://nats1.plugis.com:443")
 	assert.NoError(err)
 	assert.True(transport.Connected())
 
