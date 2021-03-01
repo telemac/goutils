@@ -57,7 +57,7 @@ func (nsr *NatsServiceRepository) Start(ctx context.Context, natsSvc NatsService
 
 // Logger returns the logger for the service repository
 func (nsr *NatsServiceRepository) Logger() *logrus.Entry {
-	return nsr.logger
+	return nsr.logger.WithField("service", nsr.Name())
 }
 
 // Transport returns the transport for the service repository
