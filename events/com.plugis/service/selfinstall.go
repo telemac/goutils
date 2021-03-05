@@ -24,11 +24,7 @@ func (svc *SelfInstallService) Stop(s service.Service) error {
 	return nil
 }
 
-func (svc *SelfInstallService) Run(ctx context.Context, params ...interface{}) error {
-	log := svc.Logger()
-	log.Debug("serSelfInstallServicevice started")
-	defer log.Debug("SelfInstallService ended")
-
+func (svc *SelfInstallService) Install() error {
 	options := make(service.KeyValue)
 	options["Restart"] = "on-success"
 	options["SuccessExitStatus"] = "1 2 8 SIGKILL"
@@ -42,24 +38,36 @@ func (svc *SelfInstallService) Run(ctx context.Context, params ...interface{}) e
 		Option: options,
 	}
 
-	interactive := service.Interactive()
 	s, err := service.New(svc, svcConfig)
 	if err != nil {
-		log.Fatal("install service")
+		return err
 	}
-	if interactive {
-		log.Debug("install service")
-		err = s.Install()
-		if err == nil {
-			// start the installed service
-			err = s.Start()
-			if err != nil {
-				log.WithError(err).Error("start service")
-			}
 
+	err = s.Install()
+	if err == nil {
+		// start the installed service
+		err = s.Start()
+		if err != nil {
+			return err
 		}
-		if err != nil && !strings.Contains(err.Error(), "already exists") {
-			log.WithError(err).Error("install service")
+
+	}
+	if err != nil && !strings.Contains(err.Error(), "already exists") {
+		return err
+	}
+	return nil
+}
+
+func (svc *SelfInstallService) Run(ctx context.Context, params ...interface{}) error {
+	svc.Logger().Debug("serSelfInstallServicevice started")
+	defer svc.Logger().Debug("SelfInstallService ended")
+
+	interactive := service.Interactive()
+
+	if interactive {
+		err := svc.Install()
+		if err != nil {
+			return err
 		}
 	}
 
