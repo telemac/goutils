@@ -82,7 +82,7 @@ func (svc *HeartbeatSaver) Run(ctx context.Context, params ...interface{}) error
 	}
 	err := svc.db.Open(dbConfig)
 	if err != nil {
-		log.Error("connect to database")
+		log.WithError(err).Error("connect to database")
 	}
 
 	// register eventHandler for event reception

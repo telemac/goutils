@@ -38,12 +38,16 @@ func (d *Database) Open(dbConfig DatabaseConfig) error {
 
 	const createTableSql = `create table if not exists heartbeats
 (
-    id              int auto_increment primary key,
+    id              int auto_increment
+        primary key,
     mac             varchar(17) not null,
     hostname        varchar(64) null,
-    last_heartbeat  datetime    not null,
+    ip              varchar(64) null,
     first_heartbeat datetime    null,
-    constraint heartbeats_mac_uindex  unique (mac)
+    last_heartbeat  datetime    not null,
+    comment         tinytext    null,
+    constraint heartbeats_mac_uindex
+        unique (mac)
 );`
 	return d.db.Exec(createTableSql).Error
 }
