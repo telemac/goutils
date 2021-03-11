@@ -1,0 +1,15 @@
+<!-- /views/admin/master.html -->
+<!doctype html>
+
+<html>
+    <head>
+        {{template "head" .}}
+        <title>{{.title}}</title>
+    </head>
+
+    <body>
+        {{template "content" .}}
+        <hr>
+        {{include "layouts/footer"}}
+    </body>
+</html>

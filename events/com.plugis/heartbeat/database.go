@@ -64,3 +64,43 @@ on duplicate key update
 
 	return err
 }
+
+func (d *Database) getHeartbeat(valid bool) ([]map[string]interface{}, error) {
+	sqlStr := ``
+	if valid {
+		sqlStr = `select mac,TIMEDIFF(now(),last_heartbeat) as elapsed,last_heartbeat
+from plugis.heartbeats
+where TIMEDIFF(now(),last_heartbeat)<=60
+order by last_heartbeat desc;`
+	} else {
+		sqlStr = `sselect mac,TIMEDIFF(now(),last_heartbeat) as elapsed,last_heartbeat
+from plugis.heartbeats
+where TIMEDIFF(now(),last_heartbeat)>60
+order by last_heartbeat desc;`
+	}
+	tx := d.db.Exec(sqlStr)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	var dest []map[string]interface{}
+	err := tx.Table("plugis.heartbeats").Find(&dest).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return dest, nil
+}
+
+/*
+# valid heartbeats
+select mac,TIMEDIFF(now(),last_heartbeat) as elapsed,last_heartbeat
+from plugis.heartbeats
+where TIMEDIFF(now(),last_heartbeat)<=60
+order by last_heartbeat desc;
+
+# invalid heartbeats
+select mac,TIMEDIFF(now(),last_heartbeat) as elapsed,last_heartbeat
+from plugis.heartbeats
+where TIMEDIFF(now(),last_heartbeat)>60
+order by last_heartbeat desc;
+*/
