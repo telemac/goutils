@@ -1,0 +1,12 @@
+appname: event-saver
+
+servers:
+  - name: nats://nats1.plugis.com:443
+    sni:  true
+
+db:
+  dbtype:   postgre
+  database: plugis
+  user:     plugis
+  password: telemac
+  port:     5432
