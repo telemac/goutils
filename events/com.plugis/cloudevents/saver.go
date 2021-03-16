@@ -45,12 +45,13 @@ func (svc *CloudEventSaver) Run(ctx context.Context, params ...interface{}) erro
 		DBname: "plugis",
 		DBuser: "plugis",
 		DBpass: "plugis",
-		DBPort: 26257,
+		DBPort: 5432, // postgres
+		//DBPort: 26257, // cockroachDB
 	}
 
 	err := svc.db.Open(dbConfig)
 	if err != nil {
-		log.Error("connect to database")
+		log.WithError(err).Error("connect to database")
 		return err
 	}
 
