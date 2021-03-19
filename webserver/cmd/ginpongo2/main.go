@@ -4,8 +4,10 @@ import (
 	"github.com/flosch/pongo2"
 	"github.com/gin-gonic/gin"
 	"github.com/stnc/pongo2gin"
+	"github.com/telemac/goutils/files"
 	"log"
 	"net/http"
+	"path"
 )
 
 //GetPongoTemplates all list
@@ -21,8 +23,18 @@ func GetPongoTemplates(c *gin.Context) {
 		"selman tunç",
 	}
 	// Call the HTML method of the Context to render a template
-	path := c.Param("path")
-	c.HTML(http.StatusOK, path,
+	uri := c.Param("uri")
+
+	fileName := path.Join("templates/", uri)
+	fileExists, _ := files.FileExists(fileName)
+	if !fileExists {
+		c.HTML(404, "404.html", pongo2.Context{
+			"file": fileName,
+		})
+		return
+	}
+
+	c.HTML(http.StatusOK, uri,
 		pongo2.Context{
 			"title": "hello pongo",
 			"posts": posts,
@@ -36,6 +48,6 @@ func main() {
 	r := gin.Default()
 	r.Use(gin.Recovery())
 	r.HTMLRender = pongo2gin.TemplatePath("templates")
-	r.GET("templates/*path", GetPongoTemplates)
+	r.GET("templates/*uri", GetPongoTemplates)
 	log.Fatal(r.Run(":8888"))
 }
