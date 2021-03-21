@@ -1,0 +1,7 @@
+{{ define "colorlist" }}
+<ul>
+    {{ range $color := .Colors }}
+    <li style="color: {{ $color }}">{{ $color }}</li>
+    {{ end }}
+</ul>
+{{ end }}

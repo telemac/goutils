@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>title={{ template "title" . }}</title>
+</head>
+<body>
+    <h1>templates layout</h1>
+    {{ template "content" . }}
+    <div>
+        data = {{ . }}
+    </div>
+</body>
+</html>
