@@ -2,13 +2,9 @@ package heartbeat
 
 import (
 	"context"
-	"errors"
-	"github.com/foolin/goview"
-	"github.com/foolin/goview/supports/ginview"
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 	"github.com/telemac/goutils/natsservice"
-	"net/http"
-	"time"
+	"github.com/telemac/goutils/webserver"
 )
 
 // HeartbeatWebInterface exposes com.plugis.heartbeat.Sent events
@@ -16,20 +12,6 @@ import (
 type HeartbeatWebInterface struct {
 	natsservice.NatsService
 	db Database
-}
-
-func (svc *HeartbeatWebInterface) getIndex(ctx *gin.Context) {
-	//render with master
-	records, err := svc.db.getHeartbeat(true)
-	ctx.HTML(http.StatusOK, "index", gin.H{
-		"title":      "Index title!",
-		"name":       "Alexandre",
-		"heartbeats": records,
-		"error":      err,
-		"add": func(a int, b int) int {
-			return a + b
-		},
-	})
 }
 
 func (svc *HeartbeatWebInterface) Run(ctx context.Context, params ...interface{}) error {
@@ -51,42 +33,19 @@ func (svc *HeartbeatWebInterface) Run(ctx context.Context, params ...interface{}
 		return err
 	}
 
-	router := gin.Default()
+	server := webserver.NewFiberServer("/views/", "/static/", 8080)
 
-	//new template engine
-	config := goview.DefaultConfig
-	config.DisableCache = true
-	router.HTMLRender = ginview.New(config)
-
-	router.GET("/", svc.getIndex)
-
-	router.GET("/page", func(ctx *gin.Context) {
-		//render only file, must full name with extension
-		ctx.HTML(http.StatusOK, "page.html", gin.H{"title": "Page file title!!"})
+	server.AddTemplateDataProvider("heartbeats", func(c *fiber.Ctx) (fiber.Map, error) {
+		records, err := svc.db.getHeartbeat(true)
+		return fiber.Map{
+			"heartbeats": records,
+		}, err
 	})
 
-	srv := &http.Server{
-		Addr:    ":8080",
-		Handler: router,
+	err = server.Run(ctx)
+	if err != nil {
+		log.WithError(err).Error("start web server")
 	}
 
-	go func() {
-		// service connections
-		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			log.WithError(err).Error("listen")
-			// TODO : exit Run function on error
-		}
-	}()
-
-	<-ctx.Done()
-
-	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
-	defer cancel()
-
-	if err := srv.Shutdown(ctx); err != nil {
-		log.WithError(err).Error("Server Shutdown")
-		return err
-	}
-
-	return nil
+	return err
 }

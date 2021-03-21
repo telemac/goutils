@@ -66,24 +66,24 @@ on duplicate key update
 }
 
 func (d *Database) getHeartbeat(valid bool) ([]map[string]interface{}, error) {
-	sqlStr := ``
-	if valid {
-		sqlStr = `select mac,TIMEDIFF(now(),last_heartbeat) as elapsed,last_heartbeat
-from plugis.heartbeats
-where TIMEDIFF(now(),last_heartbeat)<=60
-order by last_heartbeat desc;`
-	} else {
-		sqlStr = `sselect mac,TIMEDIFF(now(),last_heartbeat) as elapsed,last_heartbeat
-from plugis.heartbeats
-where TIMEDIFF(now(),last_heartbeat)>60
-order by last_heartbeat desc;`
-	}
-	tx := d.db.Exec(sqlStr)
-	if tx.Error != nil {
-		return nil, tx.Error
-	}
+	//	sqlStr := ``
+	//	if valid {
+	//		sqlStr = `select mac,TIMEDIFF(now(),last_heartbeat) as elapsed,last_heartbeat
+	//from plugis.heartbeats
+	//where TIMEDIFF(now(),last_heartbeat)<=60
+	//order by last_heartbeat desc;`
+	//	} else {
+	//		sqlStr = `sselect mac,TIMEDIFF(now(),last_heartbeat) as elapsed,last_heartbeat
+	//from plugis.heartbeats
+	//where TIMEDIFF(now(),last_heartbeat)>60
+	//order by last_heartbeat desc;`
+	//	}
+	//	tx := d.db.Exec(sqlStr)
+	//	if tx.Error != nil {
+	//		return nil, tx.Error
+	//	}
 	var dest []map[string]interface{}
-	err := tx.Table("plugis.heartbeats").Find(&dest).Error
+	err := d.db.Table("plugis.heartbeats").Order("last_heartbeat desc").Select("*,TIMEDIFF(now(),last_heartbeat) as elapsed").Find(&dest).Error
 	if err != nil {
 		return nil, err
 	}
