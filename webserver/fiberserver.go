@@ -23,7 +23,7 @@ type FiberServer struct {
 }
 
 func NewFiberServer(viewsFolder string, staticFolder string, listenPort int) *FiberServer {
-	engine := html.NewFileSystem(http.Dir(viewsFolder), ".html")
+	engine := html.NewFileSystem(http.Dir("."+viewsFolder), ".html")
 	engine.Reload(true)       // Optional. Default: false
 	engine.Debug(true)        // Optional. Default: false
 	engine.Layout("embed")    // Optional. Default: "embed"
@@ -44,7 +44,7 @@ func NewFiberServer(viewsFolder string, staticFolder string, listenPort int) *Fi
 		TemplateDataProviders: make(map[string]TemplateDataProviderFn),
 	}
 
-	app.Static("/", staticFolder)
+	app.Static("/", "."+staticFolder)
 
 	app.Get(viewsFolder+"*", func(c *fiber.Ctx) error {
 		path := c.Path()
