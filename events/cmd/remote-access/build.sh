@@ -8,5 +8,3 @@ md5 ./bin/linux/amd64/$BINARY > ./bin/linux/amd64/$BINARY.md5
 md5 ./bin/linux/arm/$BINARY > ./bin/linux/arm/$BINARY.md5
 md5 ./bin/darwin/amd64/$BINARY > ./bin/darwin/amd64/$BINARY.md5
 md5 ./bin/windows/amd64/$BINARY > ./bin/windows/amd64/$BINARY.md5
-
-rsync -avP ./bin/ update.plugis.com:~/data/update.plugis.com/www/
