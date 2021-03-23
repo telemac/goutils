@@ -7,10 +7,16 @@
         thead {
             background-color: pink;
         }
+        .good {
+            color: green;
+        }
+        .bad {
+            color: red;
+        }
     </style>
-<script>
-    setInterval(() => window.location.reload(),60*1000)
-</script>
+    <script>
+        setInterval(() => window.location.reload(),60*1000)
+    </script>
 {{end}}
 
 {{define "content"}}
@@ -28,7 +34,7 @@
         </thead>
         <tbody>
 {{range $k,$heartbeat := .heartbeats}}
-            <tr>
+            <tr class="{{ if gt .elapsed "00:01:00" }}bad{{else}}good{{end}}">
                 <td>{{ $k }}</td>
                 <td>{{ .mac }}</td>
                 <td>{{ .comment }}</td>

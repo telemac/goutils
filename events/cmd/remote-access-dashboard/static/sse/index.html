@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Server Sent Events test</title>
+    <script>
+        var evtSource = new EventSource("/sse/events");
+
+        evtSource.onmessage = function(e) {
+            console.log("evtSource.onmessage", e.type, e)
+
+            var newElement = document.createElement("li");
+            newElement.innerHTML = "message: " + e.data;
+            document.getElementById("list").appendChild(newElement)
+        }
+
+        evtSource.onerror = function(e) {
+            console.log("evtSource.onerror", e.type, e)
+        };
+
+        evtSource.addEventListener("com.idronenet.drone.position", function(e) {
+            console.log("evtSource.ping", e.type, e)
+            var newElement = document.createElement("li");
+            var obj = (e.data);
+            newElement.innerHTML = "ping at " + obj.time;
+            document.getElementById("list").appendChild(newElement)
+        }, false);
+
+    </script>
+</head>
+<body>
+<ul id="list">
+    <li>Server Sent Events</li>
+</ul>
+</body>
+</html>
