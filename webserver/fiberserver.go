@@ -98,7 +98,7 @@ func (s *FiberServer) Run(ctx context.Context) error {
 			log.WithError(err).Error("app.Shutdown")
 		}
 	}()
-	return s.App.Listen(fmt.Sprintf(":%d", s.listenPort))
+	return s.App.Listen(fmt.Sprintf("0.0.0.0:%d", s.listenPort))
 }
 
 func (s *FiberServer) AddTemplateDataProvider(path string, callback TemplateDataProviderFn) error {
