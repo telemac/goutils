@@ -65,7 +65,7 @@ on duplicate key update
 	return err
 }
 
-func (d *Database) getHeartbeat(valid bool) ([]map[string]interface{}, error) {
+func (d *Database) getHeartbeats(valid bool) ([]map[string]interface{}, error) {
 	//	sqlStr := ``
 	//	if valid {
 	//		sqlStr = `select mac,TIMEDIFF(now(),last_heartbeat) as elapsed,last_heartbeat
@@ -83,7 +83,7 @@ func (d *Database) getHeartbeat(valid bool) ([]map[string]interface{}, error) {
 	//		return nil, tx.Error
 	//	}
 	var dest []map[string]interface{}
-	err := d.db.Table("plugis.heartbeats").Order("last_heartbeat desc").Select("*,TIMEDIFF(now(),last_heartbeat) as elapsed").Find(&dest).Error
+	err := d.db.Table("heartbeats").Order("last_heartbeat desc").Select("*,TIMEDIFF(now(),last_heartbeat) as elapsed").Find(&dest).Error
 	if err != nil {
 		return nil, err
 	}

@@ -24,6 +24,7 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.6.1
 	github.com/tevino/abool v1.2.0
+	github.com/valyala/fasthttp v1.18.0 // indirect
 	go.opencensus.io v0.22.6 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.16.0 // indirect

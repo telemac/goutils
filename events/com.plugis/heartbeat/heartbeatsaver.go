@@ -13,7 +13,12 @@ import (
 // and saves events in a database
 type HeartbeatSaver struct {
 	natsservice.NatsService
-	db Database
+	DatabaseConfig DatabaseConfig
+	db             Database
+}
+
+func NewHeartbeatSaver(databaseConfig DatabaseConfig) *HeartbeatSaver {
+	return &HeartbeatSaver{DatabaseConfig: databaseConfig}
 }
 
 func (svc *HeartbeatSaver) Logger() *logrus.Entry {
@@ -72,15 +77,7 @@ func (svc *HeartbeatSaver) Run(ctx context.Context, params ...interface{}) error
 	log.Debug("heartbeat-saver service started")
 	defer log.Debug("heartbeat-saver service ended")
 
-	// premare database
-	dbConfig := DatabaseConfig{
-		DBHost: "127.0.0.1",
-		DBname: "plugis",
-		DBuser: "root",
-		DBpass: "telemac",
-		DBPort: 3306,
-	}
-	err := svc.db.Open(dbConfig)
+	err := svc.db.Open(svc.DatabaseConfig)
 	if err != nil {
 		log.WithError(err).Error("connect to database")
 	}

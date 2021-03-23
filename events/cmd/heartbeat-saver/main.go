@@ -21,15 +21,18 @@ func main() {
 	servicesRepository.Logger().Info("heartbeat-saver service starting")
 
 	// start heartbeat saver
-	servicesRepository.Start(ctx, &heartbeat.HeartbeatSaver{})
 
-	// start heartbeat sender
-	//servicesRepository.Start(ctx, &heartbeat.HeartbeatSender{
-	//	Period:       55,
-	//	RandomPeriod: 4,
-	//})
+	dbConfig := heartbeat.DatabaseConfig{
+		DBHost: "127.0.0.1",
+		DBname: "plugis",
+		DBuser: "plugis",
+		DBpass: "plugis",
+		DBPort: 3306,
+	}
+
+	servicesRepository.Start(ctx, heartbeat.NewHeartbeatSaver(dbConfig))
 
 	servicesRepository.WaitUntilAllDone()
 
-	servicesRepository.Logger().Info("tempest service ending")
+	servicesRepository.Logger().Info("heartbeat-saver service ending")
 }
