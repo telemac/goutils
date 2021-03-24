@@ -25,6 +25,18 @@ func NewHeartbeatWebInterface(mysqlConfig natsservice.MysqlConfig) *HeartbeatWeb
 	return &HeartbeatWebInterface{mysqlConfig: mysqlConfig}
 }
 
+/* sample curl request
+curl -X POST --location "http://localhost:8080/cloudevents/send" -H "Content-Type: application/json" -d "{
+          \"topic\": \"com.plugis.browser\",
+          \"request\": true,
+          \"timeout\": 5,
+          \"data\": {\"url\": \"https://www.youtube.com\"},
+          \"id\": \"123\",
+          \"source\": \"web\",
+          \"specversion\": \"1.0\",
+          \"type\": \"com.plugis.browser.open\"
+        }"
+*/
 func (svc *HeartbeatWebInterface) Run(ctx context.Context, params ...interface{}) error {
 	log := svc.Logger()
 	log.Debug("heartbeat-web-interface service started")
