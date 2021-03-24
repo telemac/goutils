@@ -2,6 +2,7 @@ package heartbeat
 
 import (
 	"fmt"
+	"github.com/telemac/goutils/natsservice"
 	"gorm.io/driver/mysql"
 	_ "gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -19,15 +20,15 @@ type Database struct {
 	db *gorm.DB
 }
 
-func (d *Database) Open(dbConfig DatabaseConfig) error {
+func (d *Database) Open(dbConfig natsservice.MysqlConfig) error {
 	// make logger dsn
 	dsn := fmt.Sprintf(
 		"%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
-		dbConfig.DBuser,
-		dbConfig.DBpass,
-		dbConfig.DBHost,
-		dbConfig.DBPort,
-		dbConfig.DBname,
+		dbConfig.User,
+		dbConfig.Password,
+		dbConfig.Host,
+		dbConfig.Port,
+		dbConfig.Database,
 	)
 
 	var err error

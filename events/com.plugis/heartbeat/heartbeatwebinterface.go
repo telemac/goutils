@@ -15,12 +15,12 @@ import (
 // that are saved in the database
 type HeartbeatWebInterface struct {
 	natsservice.NatsService
-	db       Database
-	dbConfig DatabaseConfig
+	db          Database
+	mysqlConfig natsservice.MysqlConfig
 }
 
-func NewHeartbeatWebInterface(dbConfig DatabaseConfig) *HeartbeatWebInterface {
-	return &HeartbeatWebInterface{dbConfig: dbConfig}
+func NewHeartbeatWebInterface(mysqlConfig natsservice.MysqlConfig) *HeartbeatWebInterface {
+	return &HeartbeatWebInterface{mysqlConfig: mysqlConfig}
 }
 
 func (svc *HeartbeatWebInterface) Run(ctx context.Context, params ...interface{}) error {
@@ -28,7 +28,7 @@ func (svc *HeartbeatWebInterface) Run(ctx context.Context, params ...interface{}
 	log.Debug("heartbeat-web-interface service started")
 	defer log.Debug("heartbeat-web-interface service ended")
 
-	err := svc.db.Open(svc.dbConfig)
+	err := svc.db.Open(svc.mysqlConfig)
 	if err != nil {
 		log.WithError(err).Error("connect to database")
 		return err
