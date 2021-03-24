@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"github.com/cloudevents/sdk-go/v2/event"
+	"github.com/cloudevents/sdk-go/v2/types"
 	"github.com/gofiber/fiber/v2"
 	"github.com/telemac/goutils/natsservice"
 	"github.com/telemac/goutils/webserver"
@@ -75,6 +77,88 @@ func (svc *HeartbeatWebInterface) Run(ctx context.Context, params ...interface{}
 				time.Sleep(1 * time.Second)
 			}
 		}))
+
+		return nil
+	})
+
+	server.App.Post("/cloudevents/send", func(c *fiber.Ctx) error {
+		var ce event.Event
+		err := c.BodyParser(&ce)
+		if err != nil {
+			log.WithError(err).Warn("parse cloudEvent from body")
+			c.SendStatus(500)
+			c.SendString(err.Error())
+			return err
+		}
+		err = ce.Validate()
+		if err != nil {
+			log.WithError(err).Warn("validate cloudEvent")
+			c.SendStatus(500)
+			c.SendString(err.Error())
+			return err
+		}
+
+		extensions := ce.Extensions()
+		topic, err := types.ToString(extensions["topic"])
+		if err != nil {
+			log.WithError(err).Warn("get cloudEvent topic")
+			c.SendStatus(500)
+			c.SendString(err.Error())
+			return err
+		}
+
+		request := false
+		val, ok := extensions["request"]
+		if ok {
+			request, err = types.ToBool(val)
+			if err != nil {
+				log.WithError(err).Warn("get cloudEvent request")
+				c.SendStatus(500)
+				c.SendString(err.Error())
+				return err
+			}
+		}
+
+		var timeout int32 = 60 // default 60sec timeout
+		val, ok = extensions["timeout"]
+		if ok {
+			timeout, err = types.ToInteger(val)
+			if err != nil {
+				log.WithError(err).Warn("get cloudEvent timeout")
+				c.SendStatus(500)
+				c.SendString(err.Error())
+				return err
+			}
+		}
+
+		duration := time.Second * time.Duration(timeout)
+		ctx, _ := context.WithTimeout(context.TODO(), duration)
+		if request {
+			returnedEvent, err := svc.Transport().Request(ctx, ce, topic, duration)
+			if err != nil {
+				log.WithError(err).Warn("cloudEvent request")
+				c.SendStatus(500)
+				c.SendString(err.Error())
+				return err
+			}
+			c.JSON(returnedEvent)
+
+		} else {
+			err = svc.Transport().Send(ctx, ce, topic)
+			if err != nil {
+				if err != nil {
+					log.WithError(err).Warn("send cloudEvent")
+					c.SendStatus(500)
+					c.SendString(err.Error())
+					return err
+				}
+			}
+		}
+
+		fmt.Printf("cloudEvent = %+v\n", ce)
+		fmt.Printf("topic = %s\n", topic)
+		fmt.Printf("request = %v\n", request)
+		fmt.Printf("timeout = %d\n", timeout)
 
 		return nil
 	})

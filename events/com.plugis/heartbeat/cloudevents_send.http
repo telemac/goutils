@@ -1,0 +1,14 @@
+### Send POST request with json body
+POST http://localhost:8080/cloudevents/send
+Content-Type: application/json
+
+{
+  "topic": "com.plugis.browser",
+  "request": true,
+  "timeout": 5,
+  "data": {"url": "https://www.tf1.fr"},
+  "id": "123",
+  "source": "web",
+  "specversion": "1.0",
+  "type": "com.plugis.browser.open"
+}
