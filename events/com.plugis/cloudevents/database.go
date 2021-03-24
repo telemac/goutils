@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/cloudevents/sdk-go/v2/event"
 	"github.com/google/uuid"
+	"github.com/telemac/goutils/natsservice"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"time"
@@ -13,23 +14,15 @@ type Database struct {
 	db *gorm.DB
 }
 
-type DatabaseConfig struct {
-	DBHost string `ini:"dbhost,omitempty"`
-	DBname string `ini:"dbname,omitempty"`
-	DBuser string `ini:"dbuser,omitempty"`
-	DBpass string `ini:"dbpass,omitempty"`
-	DBPort int    `ini:"dbport,omitempty"`
-}
-
-func (d *Database) Open(dbConfig DatabaseConfig) error {
+func (d *Database) Open(dbConfig natsservice.PostgresConfig) error {
 	// make logger dsn
 	dsn := fmt.Sprintf(
 		"user=%s password=%s host=%s port=%d dbname=%s sslmode=disable TimeZone=Europe/Paris",
-		dbConfig.DBuser,
-		dbConfig.DBpass,
-		dbConfig.DBHost,
-		dbConfig.DBPort,
-		dbConfig.DBname,
+		dbConfig.User,
+		dbConfig.Password,
+		dbConfig.Host,
+		dbConfig.Port,
+		dbConfig.Database,
 	)
 
 	var err error

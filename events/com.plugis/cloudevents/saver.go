@@ -13,7 +13,12 @@ import (
 // and saves them in a postgresql database
 type CloudEventSaver struct {
 	natsservice.NatsService
-	db Database
+	db             Database
+	postgresConfig natsservice.PostgresConfig
+}
+
+func NewCloudEventSaver(postgresConfig natsservice.PostgresConfig) *CloudEventSaver {
+	return &CloudEventSaver{postgresConfig: postgresConfig}
 }
 
 func (svc *CloudEventSaver) Logger() *logrus.Entry {
@@ -39,17 +44,7 @@ func (svc *CloudEventSaver) Run(ctx context.Context, params ...interface{}) erro
 	log.Debug("service started")
 	defer log.Debug("service ended")
 
-	// premare database
-	dbConfig := DatabaseConfig{
-		DBHost: "localhost",
-		DBname: "plugis",
-		DBuser: "plugis",
-		DBpass: "plugis",
-		DBPort: 5432, // postgres
-		//DBPort: 26257, // cockroachDB
-	}
-
-	err := svc.db.Open(dbConfig)
+	err := svc.db.Open(svc.postgresConfig)
 	if err != nil {
 		log.WithError(err).Error("connect to database")
 		return err
