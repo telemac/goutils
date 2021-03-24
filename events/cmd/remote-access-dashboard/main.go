@@ -9,6 +9,11 @@ import (
 )
 
 func main() {
+	config, err := natsservice.LoadConfig("./remote-access-dashboard.yml")
+	if err != nil {
+		logrus.WithError(err).Fatal("open config file")
+	}
+
 	// create main context
 	ctx, cancel := task.NewCancellableContext(time.Second * 15)
 	defer cancel()
@@ -21,7 +26,7 @@ func main() {
 
 	servicesRepository.Logger().Info("remote-access-dashboard service starting")
 
-	servicesRepository.Start(ctx, &heartbeat.HeartbeatWebInterface{})
+	servicesRepository.Start(ctx, heartbeat.NewHeartbeatWebInterface(config.Mysql))
 
 	servicesRepository.WaitUntilAllDone()
 
