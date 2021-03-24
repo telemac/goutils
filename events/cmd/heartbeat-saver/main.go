@@ -9,6 +9,11 @@ import (
 )
 
 func main() {
+	config, err := natsservice.LoadConfig("./heartbeat-saver.yml")
+	if err != nil {
+		logrus.WithError(err).Fatal("open config file")
+	}
+
 	ctx, cancel := task.NewCancellableContext(time.Second * 15)
 	defer cancel()
 
@@ -21,16 +26,7 @@ func main() {
 	servicesRepository.Logger().Info("heartbeat-saver service starting")
 
 	// start heartbeat saver
-
-	dbConfig := heartbeat.DatabaseConfig{
-		DBHost: "127.0.0.1",
-		DBname: "plugis",
-		DBuser: "plugis",
-		DBpass: "plugis",
-		DBPort: 3306,
-	}
-
-	servicesRepository.Start(ctx, heartbeat.NewHeartbeatSaver(dbConfig))
+	servicesRepository.Start(ctx, heartbeat.NewHeartbeatSaver(config.Mysql))
 
 	servicesRepository.WaitUntilAllDone()
 

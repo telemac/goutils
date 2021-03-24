@@ -9,7 +9,7 @@ postgres:
   port:     5432
 
 mysql:
-  database: plugis_modified
+  database: plugis
   user:     plugis
   password: plugis
   port:     3306
