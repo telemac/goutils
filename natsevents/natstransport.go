@@ -6,6 +6,7 @@ import (
 	"errors"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/cloudevents/sdk-go/v2/event"
+	"github.com/cloudevents/sdk-go/v2/types"
 	"github.com/google/uuid"
 	"github.com/jimlawless/whereami"
 	"github.com/nats-io/nats.go"
@@ -307,4 +308,17 @@ func (t *NatsTransport) NewEvent(eventPrefix, eventType string, obj interface{})
 	e.SetTime(time.Now())
 	e.SetID(uuid.NewString())
 	return e
+}
+
+// EventFillDefaults fills the required field with default values if not already set
+func EventFillDefaults(e *event.Event) {
+	if e.SpecVersion() == "" {
+		e.SetSpecVersion(event.CloudEventsVersionV1)
+	}
+	if e.ID() == "" {
+		e.SetID(uuid.NewString())
+	}
+	if types.IsZero(e.Time()) {
+		e.SetTime(time.Now())
+	}
 }

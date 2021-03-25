@@ -7,6 +7,7 @@ import (
 	"github.com/cloudevents/sdk-go/v2/event"
 	"github.com/cloudevents/sdk-go/v2/types"
 	"github.com/gofiber/fiber/v2"
+	"github.com/telemac/goutils/natsevents"
 	"github.com/telemac/goutils/natsservice"
 	"github.com/telemac/goutils/webserver"
 	"github.com/valyala/fasthttp"
@@ -25,18 +26,6 @@ func NewHeartbeatWebInterface(mysqlConfig natsservice.MysqlConfig) *HeartbeatWeb
 	return &HeartbeatWebInterface{mysqlConfig: mysqlConfig}
 }
 
-/* sample curl request
-curl -X POST --location "http://localhost:8080/cloudevents/send" -H "Content-Type: application/json" -d "{
-          \"topic\": \"com.plugis.browser\",
-          \"request\": true,
-          \"timeout\": 5,
-          \"data\": {\"url\": \"https://www.youtube.com\"},
-          \"id\": \"123\",
-          \"source\": \"web\",
-          \"specversion\": \"1.0\",
-          \"type\": \"com.plugis.browser.open\"
-        }"
-*/
 func (svc *HeartbeatWebInterface) Run(ctx context.Context, params ...interface{}) error {
 	log := svc.Logger()
 	log.Debug("heartbeat-web-interface service started")
@@ -93,6 +82,18 @@ func (svc *HeartbeatWebInterface) Run(ctx context.Context, params ...interface{}
 		return nil
 	})
 
+	/* sample curl request
+	curl -X POST --location "http://localhost:8080/cloudevents/send" -H "Content-Type: application/json" -d "{
+	          \"topic\": \"com.plugis.browser\",
+	          \"request\": true,
+	          \"timeout\": 5,
+	          \"data\": {\"url\": \"https://www.youtube.com\"},
+	          \"id\": \"123\",
+	          \"source\": \"web\",
+	          \"specversion\": \"1.0\",
+	          \"type\": \"com.plugis.browser.open\"
+	        }"
+	*/
 	server.App.Post("/cloudevents/send", func(c *fiber.Ctx) error {
 		var ce event.Event
 		err := c.BodyParser(&ce)
@@ -102,6 +103,9 @@ func (svc *HeartbeatWebInterface) Run(ctx context.Context, params ...interface{}
 			c.SendString(err.Error())
 			return err
 		}
+		// TODO : fill missing cloudEvent fields
+		natsevents.EventFillDefaults(&ce)
+
 		err = ce.Validate()
 		if err != nil {
 			log.WithError(err).Warn("validate cloudEvent")
