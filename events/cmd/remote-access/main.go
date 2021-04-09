@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"github.com/sirupsen/logrus"
+	"github.com/telemac/goutils/events/com.plugis/browser"
 	"github.com/telemac/goutils/events/com.plugis/heartbeat"
 	"github.com/telemac/goutils/events/com.plugis/service"
 	"github.com/telemac/goutils/events/com.plugis/shell"
@@ -87,7 +88,7 @@ func main() {
 	servicesRepository.Start(ctx, &shell.ShellService{})
 
 	// browser service
-	//servicesRepository.Start(ctx, &browser.BrowserService{})
+	servicesRepository.Start(ctx, &browser.BrowserService{})
 
 	servicesRepository.WaitUntilAllDone()
 
