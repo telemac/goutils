@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/cloudevents/sdk-go/v2/event"
 	"github.com/sirupsen/logrus"
 	"github.com/telemac/goutils/events/com.plugis/shell"
 	"github.com/telemac/goutils/natsservice"
@@ -26,11 +25,8 @@ func main() {
 	// create  service
 	servicesRepository.Start(ctx, &shell.ShellService{})
 
-	cmdEvent := event.New(event.CloudEventsVersionV1)
-	cmdEvent.SetType("com.plugis.shell.command")
 	cmd := shell.ShellCommandParams{Command: []string{"df", "-lh", "/"}}
-	cmdEvent.SetData(event.ApplicationJSON, cmd)
-	cmdEvent.SetID("my-unique-id")
+	cmdEvent := servicesRepository.Transport().NewEvent("com.plugis.", "shell.command", cmd)
 
 	resp, err := servicesRepository.Transport().Request(ctx, cmdEvent, "com.plugis.shell", time.Second*5)
 	if err != nil {

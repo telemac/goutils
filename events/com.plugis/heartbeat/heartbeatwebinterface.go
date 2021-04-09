@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"github.com/cloudevents/sdk-go/v2/event"
+	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/cloudevents/sdk-go/v2/types"
 	"github.com/gofiber/fiber/v2"
 	"github.com/telemac/goutils/natsevents"
@@ -113,7 +113,7 @@ func (svc *HeartbeatWebInterface) Run(ctx context.Context, params ...interface{}
 			c.JSON(response)
 		}
 
-		var ce event.Event
+		var ce cloudevents.Event
 		// TODO : use own structure for event to allow missing specversion
 		err := c.BodyParser(&ce)
 		if err != nil {
@@ -164,7 +164,7 @@ func (svc *HeartbeatWebInterface) Run(ctx context.Context, params ...interface{}
 		duration := time.Second * time.Duration(timeout)
 		ctx, _ := context.WithTimeout(context.TODO(), duration)
 		if request {
-			returnedEvent, err := svc.Transport().Request(ctx, ce, topic, duration)
+			returnedEvent, err := svc.Transport().Request(ctx, &ce, topic, duration)
 			if err != nil {
 				log.WithError(err).Warn("cloudEvent request")
 				sendResult(nil, err)
@@ -172,7 +172,7 @@ func (svc *HeartbeatWebInterface) Run(ctx context.Context, params ...interface{}
 			}
 			sendResult(returnedEvent, nil)
 		} else {
-			err = svc.Transport().Send(ctx, ce, topic)
+			err = svc.Transport().Send(ctx, &ce, topic)
 			if err != nil {
 				log.WithError(err).Warn("send cloudEvent")
 				sendResult(nil, err)

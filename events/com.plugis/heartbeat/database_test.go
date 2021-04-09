@@ -2,18 +2,19 @@ package heartbeat
 
 import (
 	"github.com/stretchr/testify/assert"
+	"github.com/telemac/goutils/natsservice"
 	"testing"
 )
 
 func TestDatabase_Open(t *testing.T) {
 	assert := assert.New(t)
 	var db Database
-	dbConfig := DatabaseConfig{
-		DBHost: "127.0.0.1",
-		DBname: "plugis",
-		DBuser: "root",
-		DBpass: "telemac",
-		DBPort: 3306,
+	dbConfig := natsservice.MysqlConfig{
+		Host:     "127.0.0.1",
+		Database: "plugis",
+		User:     "root",
+		Password: "telemac",
+		Port:     3306,
 	}
 	err := db.Open(dbConfig)
 	assert.NoError(err)
