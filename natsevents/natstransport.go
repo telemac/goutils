@@ -214,53 +214,66 @@ func (t *NatsTransport) Request(ctx context.Context, event *event.Event, topic s
 	return responseEvent, nil
 }
 
+func (t *NatsTransport) processNatsMessage(cloudEventHandler CloudEventHandler, msg *nats.Msg) {
+	var (
+		requestEvent  = new(cloudevents.Event)
+		responseEvent *cloudevents.Event
+		handlerErr    error
+	)
+	err := requestEvent.UnmarshalJSON(msg.Data)
+	if err != nil {
+		log.WithError(err).WithField("payload", string(msg.Data)).Warn("decode cloudevent payload")
+	}
+	if err != nil {
+		// call event handler with raw payload
+		responseEvent, handlerErr = cloudEventHandler(msg.Subject, nil, msg.Data, err)
+	} else {
+		// call with decoded event
+		responseEvent, handlerErr = cloudEventHandler(msg.Subject, requestEvent, nil, nil)
+	}
+	if err != nil {
+		log.WithError(handlerErr).WithField("request", requestEvent).Warn("event handler error")
+	}
+
+	if msg.Reply != "" {
+		// the reply of a cloudevent request must be a valid cloud event.
+
+		if responseEvent == nil {
+			// TODO : handle response with no event
+			responseEvent = t.NewEvent("", "eventType", 666)
+		}
+
+		var payload []byte
+		if handlerErr != nil {
+			// TODO : handle cloudEventHandler error!=nil
+		}
+		if responseEvent != nil {
+			payload, err = responseEvent.MarshalJSON()
+			if err != nil {
+				// TODO : handle json format errors here
+			}
+		}
+		err = msg.Respond(payload)
+		if err != nil {
+			// TODO : find a way to report errors in onNatsMessage fn
+		}
+	}
+}
+
 // onNatsMessage is called on each incoming nats message
 func (t *NatsTransport) onNatsMessage(msg *nats.Msg) {
+	log.WithFields(log.Fields{
+		"topic":   msg.Subject,
+		"payload": string(msg.Data),
+		"reply":   msg.Reply,
+	}).Debug("received nats message")
+
 	t.mutex.RLock()
-	defer t.mutex.RUnlock()
-
 	s, ok := t.subscriptions[msg.Sub.Subject]
+	t.mutex.RUnlock()
+
 	if ok {
-		var (
-			requestEvent  = new(cloudevents.Event)
-			responseEvent = new(cloudevents.Event)
-			handlerErr    error
-		)
-		err := requestEvent.UnmarshalJSON(msg.Data)
-		if err != nil {
-			log.WithError(err).WithField("payload", string(msg.Data)).Warn("decode cloudevent payload")
-		}
-		if err != nil {
-			// call event handler with raw payload
-			responseEvent, handlerErr = s.cloudEventHandler(msg.Subject, nil, msg.Data, err)
-		} else {
-			// call with decoded event
-			responseEvent, handlerErr = s.cloudEventHandler(msg.Subject, requestEvent, nil, nil)
-		}
-		log.WithError(handlerErr).WithField("request", requestEvent).Warn("event handler error")
-
-		if msg.Reply != "" {
-			// the reply of a cloudevent request must be a valid cloud event.
-
-			if responseEvent == nil {
-				responseEvent = t.NewEvent("", "eventType", 12345)
-			}
-
-			var payload []byte
-			if handlerErr != nil {
-				// TODO : handle cloudEventHandler error!=nil
-			}
-			if responseEvent != nil {
-				payload, err = responseEvent.MarshalJSON()
-				if err != nil {
-					// TODO : handle json format errors here
-				}
-			}
-			err = msg.Respond(payload)
-			if err != nil {
-				// TODO : find a way to report errors in onNatsMessage fn
-			}
-		}
+		go t.processNatsMessage(s.cloudEventHandler, msg)
 	} else {
 		// message not corresponding a previous subscription, notify ?
 		log.WithField("subject", msg.Sub.Subject).Warn("message Subject not subscribed")
