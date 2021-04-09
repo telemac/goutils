@@ -95,22 +95,39 @@ func (svc *HeartbeatWebInterface) Run(ctx context.Context, params ...interface{}
 	        }"
 	*/
 	server.App.Post("/cloudevents/send", func(c *fiber.Ctx) error {
+
+		sendResult := func(obj interface{}, err error) {
+			type Result struct {
+				Data  interface{} `json:"data"`
+				Error error       `json:"error"`
+			}
+			type Response struct {
+				Result `json:"result"`
+			}
+			response := Result{obj, err}
+			if err != nil {
+				c.SendStatus(500)
+			} else {
+				c.SendStatus(200)
+			}
+			c.JSON(response)
+		}
+
 		var ce event.Event
+		// TODO : use own structure for event to allow missing specversion
 		err := c.BodyParser(&ce)
 		if err != nil {
 			log.WithError(err).Warn("parse cloudEvent from body")
-			c.SendStatus(500)
-			c.SendString(err.Error())
+			sendResult(nil, err)
 			return err
 		}
-		// TODO : fill missing cloudEvent fields
+		// fill missing cloudEvent fields
 		natsevents.EventFillDefaults(&ce)
 
 		err = ce.Validate()
 		if err != nil {
 			log.WithError(err).Warn("validate cloudEvent")
-			c.SendStatus(500)
-			c.SendString(err.Error())
+			sendResult(nil, err)
 			return err
 		}
 
@@ -118,8 +135,7 @@ func (svc *HeartbeatWebInterface) Run(ctx context.Context, params ...interface{}
 		topic, err := types.ToString(extensions["topic"])
 		if err != nil {
 			log.WithError(err).Warn("get cloudEvent topic")
-			c.SendStatus(500)
-			c.SendString(err.Error())
+			sendResult(nil, err)
 			return err
 		}
 
@@ -129,8 +145,7 @@ func (svc *HeartbeatWebInterface) Run(ctx context.Context, params ...interface{}
 			request, err = types.ToBool(val)
 			if err != nil {
 				log.WithError(err).Warn("get cloudEvent request")
-				c.SendStatus(500)
-				c.SendString(err.Error())
+				sendResult(nil, err)
 				return err
 			}
 		}
@@ -141,8 +156,7 @@ func (svc *HeartbeatWebInterface) Run(ctx context.Context, params ...interface{}
 			timeout, err = types.ToInteger(val)
 			if err != nil {
 				log.WithError(err).Warn("get cloudEvent timeout")
-				c.SendStatus(500)
-				c.SendString(err.Error())
+				sendResult(nil, err)
 				return err
 			}
 		}
@@ -153,28 +167,23 @@ func (svc *HeartbeatWebInterface) Run(ctx context.Context, params ...interface{}
 			returnedEvent, err := svc.Transport().Request(ctx, ce, topic, duration)
 			if err != nil {
 				log.WithError(err).Warn("cloudEvent request")
-				c.SendStatus(500)
-				c.SendString(err.Error())
+				sendResult(nil, err)
 				return err
 			}
-			c.JSON(returnedEvent)
-
+			sendResult(returnedEvent, nil)
 		} else {
 			err = svc.Transport().Send(ctx, ce, topic)
 			if err != nil {
-				if err != nil {
-					log.WithError(err).Warn("send cloudEvent")
-					c.SendStatus(500)
-					c.SendString(err.Error())
-					return err
-				}
+				log.WithError(err).Warn("send cloudEvent")
+				sendResult(nil, err)
 			}
+			sendResult(struct{}{}, nil)
 		}
 
-		fmt.Printf("cloudEvent = %+v\n", ce)
-		fmt.Printf("topic = %s\n", topic)
-		fmt.Printf("request = %v\n", request)
-		fmt.Printf("timeout = %d\n", timeout)
+		log.Tracef("cloudEvent = %+v\n", ce)
+		log.Tracef("topic = %s\n", topic)
+		log.Tracef("request = %v\n", request)
+		log.Tracef("timeout = %d\n", timeout)
 
 		return nil
 	})
