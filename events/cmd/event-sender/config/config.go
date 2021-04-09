@@ -13,7 +13,7 @@ type EventSenderConfig struct {
 }
 
 func (c *EventSenderConfig) Parse() {
-	flag.StringVar(&c.Server, "server", "https://nats1.plugis.com", "nats server")
+	flag.StringVar(&c.Server, "server", "nats://nats1.plugis.com:443", "nats server")
 	flag.StringVar(&c.LogLevel, "log", "info", "log level (trace|debug|info|warn|error|fatal)")
 	flag.StringVar(&c.EventType, "type", "com.plugis.browser.open", "cloud event type")
 	flag.StringVar(&c.EventData, "data", `{"url":"https://google.fr"}`, "cloud event data in json format")
