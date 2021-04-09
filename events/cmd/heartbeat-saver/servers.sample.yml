@@ -1,0 +1,3 @@
+servers:
+  - url: nats://nats1.plugis.com:443
+    sni:  true

@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	config, err := natsservice.LoadConfig("./heartbeat-saver.yml")
+	config, err := natsservice.LoadConfig("./servers.yml", "./mysql.yml")
 	if err != nil {
 		logrus.WithError(err).Fatal("open config file")
 	}
@@ -17,7 +17,7 @@ func main() {
 	ctx, cancel := task.NewCancellableContext(time.Second * 15)
 	defer cancel()
 
-	servicesRepository, err := natsservice.NewNatsServiceRepository("heartbeat-saver", "https://nats1.plugis.com", "trace")
+	servicesRepository, err := natsservice.NewNatsServiceRepository("heartbeat-saver", config.Servers[0].Url, "trace")
 	if err != nil {
 		logrus.WithError(err).Fatal("create nats service repository")
 	}
@@ -27,6 +27,9 @@ func main() {
 
 	// start heartbeat saver
 	servicesRepository.Start(ctx, heartbeat.NewHeartbeatSaver(config.Mysql))
+
+	// start heartbeat web interface
+	servicesRepository.Start(ctx, heartbeat.NewHeartbeatWebInterface(config.Mysql))
 
 	servicesRepository.WaitUntilAllDone()
 
