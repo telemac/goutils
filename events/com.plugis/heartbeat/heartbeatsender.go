@@ -30,7 +30,9 @@ func (svc *HeartbeatSender) SendHeartbeatEvent(ctx context.Context) error {
 	svc.sentEventData.Uptime = uint64(time.Since(svc.sentEventData.Started).Seconds())
 
 	heartbeatEvent := t.NewEvent("com.plugis.", "", svc.sentEventData)
-	err = t.Send(ctx, heartbeatEvent, heartbeatEvent.Type()+"."+svc.sentEventData.Mac)
+	topic := heartbeatEvent.Type() + "." + svc.sentEventData.Mac
+	err = t.Send(ctx, heartbeatEvent, topic)
+	svc.Logger().WithFields(logrus.Fields{"event": heartbeatEvent, "topic": topic}).Trace("send event")
 	if err != nil {
 		svc.Logger().WithError(err).WithField("heartbeat-event", heartbeatEvent).Warn("send heartbeat cloud event")
 	}
