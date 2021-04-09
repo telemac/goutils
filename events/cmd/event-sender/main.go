@@ -11,13 +11,13 @@ import (
 )
 
 func main() {
-	var params config.EventSenderConfig
-	params.Parse()
+	var commandLineParams config.EventSenderConfig
+	commandLineParams.Parse()
 
 	ctx, cancel := task.NewCancellableContext(time.Second * 5)
 	defer cancel()
 
-	servicesRepository, err := natsservice.NewNatsServiceRepository("event-sender", params.Server, params.LogLevel)
+	servicesRepository, err := natsservice.NewNatsServiceRepository("event-sender", commandLineParams.Server, commandLineParams.LogLevel)
 	if err != nil {
 		logrus.WithError(err).Fatal("create nats service repository")
 	}
@@ -26,19 +26,19 @@ func main() {
 	servicesRepository.Logger().Infof("service starting")
 	defer servicesRepository.Logger().Infof("service ended")
 
-	eventType := params.EventType
+	eventType := commandLineParams.EventType
 	var obj interface{}
-	err = json.Unmarshal([]byte(params.EventData), &obj)
+	err = json.Unmarshal([]byte(commandLineParams.EventData), &obj)
 	if err != nil {
 		servicesRepository.Logger().WithError(err).Error("decode json")
 	}
 
-	topic := params.Topic
+	topic := commandLineParams.Topic
 
 	cloudEvent := servicesRepository.Transport().NewEvent("", eventType, obj)
 
-	if params.Request {
-		ev, err := servicesRepository.Transport().Request(ctx, cloudEvent, topic, time.Second*time.Duration(params.Timeout))
+	if commandLineParams.Request {
+		ev, err := servicesRepository.Transport().Request(ctx, cloudEvent, topic, time.Second*time.Duration(commandLineParams.Timeout))
 		_ = ev
 		fmt.Printf("err=%v, ev = %+v", err, ev)
 		if err != nil {
