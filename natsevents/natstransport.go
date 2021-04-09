@@ -170,7 +170,7 @@ func (t *NatsTransport) Flush(timeout time.Duration) error {
 }
 
 // Send sends the json representation of the event on nats topic
-func (t *NatsTransport) Send(ctx context.Context, event event.Event, topic string) error {
+func (t *NatsTransport) Send(ctx context.Context, event *event.Event, topic string) error {
 	if event.Source() == "" {
 		event.SetSource(whereami.WhereAmI(2))
 	}
@@ -187,7 +187,7 @@ func (t *NatsTransport) Send(ctx context.Context, event event.Event, topic strin
 }
 
 // Request sends a request and waits the response for timeout
-func (t *NatsTransport) Request(ctx context.Context, event event.Event, topic string, timeout time.Duration) (*event.Event, error) {
+func (t *NatsTransport) Request(ctx context.Context, event *event.Event, topic string, timeout time.Duration) (*event.Event, error) {
 	if event.Source() == "" {
 		event.SetSource(whereami.WhereAmI(2))
 	}
@@ -221,23 +221,37 @@ func (t *NatsTransport) onNatsMessage(msg *nats.Msg) {
 
 	s, ok := t.subscriptions[msg.Sub.Subject]
 	if ok {
-		var event = new(cloudevents.Event)
-		err := event.UnmarshalJSON(msg.Data)
+		var (
+			requestEvent  = new(cloudevents.Event)
+			responseEvent = new(cloudevents.Event)
+			handlerErr    error
+		)
+		err := requestEvent.UnmarshalJSON(msg.Data)
+		if err != nil {
+			log.WithError(err).WithField("payload", string(msg.Data)).Warn("decode cloudevent payload")
+		}
 		if err != nil {
 			// call event handler with raw payload
-			event, err = s.cloudEventHandler(msg.Subject, nil, msg.Data, err)
+			responseEvent, handlerErr = s.cloudEventHandler(msg.Subject, nil, msg.Data, err)
 		} else {
 			// call with decoded event
-			event, err = s.cloudEventHandler(msg.Subject, event, nil, nil)
+			responseEvent, handlerErr = s.cloudEventHandler(msg.Subject, requestEvent, nil, nil)
 		}
+		log.WithError(handlerErr).WithField("request", requestEvent).Warn("event handler error")
 
 		if msg.Reply != "" {
+			// the reply of a cloudevent request must be a valid cloud event.
+
+			if responseEvent == nil {
+				responseEvent = t.NewEvent("", "eventType", 12345)
+			}
+
 			var payload []byte
-			if err != nil {
+			if handlerErr != nil {
 				// TODO : handle cloudEventHandler error!=nil
 			}
-			if event != nil {
-				payload, err = event.MarshalJSON()
+			if responseEvent != nil {
+				payload, err = responseEvent.MarshalJSON()
 				if err != nil {
 					// TODO : handle json format errors here
 				}
@@ -248,7 +262,8 @@ func (t *NatsTransport) onNatsMessage(msg *nats.Msg) {
 			}
 		}
 	} else {
-		// TODO : message not corresponding a previous subscription, notify ?
+		// message not corresponding a previous subscription, notify ?
+		log.WithField("subject", msg.Sub.Subject).Warn("message Subject not subscribed")
 	}
 
 }
@@ -293,7 +308,7 @@ func FromContext(ctx context.Context) *NatsTransport {
 }
 
 // NewEvent creates a cloud event given minimal parameters
-func (t *NatsTransport) NewEvent(eventPrefix, eventType string, obj interface{}) event.Event {
+func (t *NatsTransport) NewEvent(eventPrefix, eventType string, obj interface{}) *event.Event {
 	e := event.New(event.CloudEventsVersionV1)
 	if eventType != "" {
 		e.SetType(eventPrefix + eventType)
@@ -307,7 +322,7 @@ func (t *NatsTransport) NewEvent(eventPrefix, eventType string, obj interface{})
 	e.SetData(event.ApplicationJSON, obj)
 	e.SetTime(time.Now())
 	e.SetID(uuid.NewString())
-	return e
+	return &e
 }
 
 // EventFillDefaults fills the required field with default values if not already set
