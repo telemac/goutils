@@ -5,6 +5,7 @@ import (
 	"github.com/cloudevents/sdk-go/v2/event"
 	"github.com/sirupsen/logrus"
 	"github.com/telemac/goutils/natsservice"
+	"github.com/telemac/goutils/net"
 )
 
 type BrowserService struct {
@@ -58,8 +59,13 @@ func (svc BrowserService) Run(ctx context.Context, params ...interface{}) error 
 
 	var err error
 
+	mac, err := net.GetMACAddress()
+	if err != nil {
+		log.Error("get mac address")
+	}
+
 	// register eventHandler for event reception
-	err = svc.Transport().RegisterHandler(svc.eventHandler, "com.plugis.browser")
+	err = svc.Transport().RegisterHandler(svc.eventHandler, "com.plugis.browser."+mac)
 	if err != nil {
 		svc.Logger().WithError(err).Error("failed to register event handler")
 		return err
