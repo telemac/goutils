@@ -3,7 +3,6 @@ package shell
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/telemac/goutils/net"
 	"os/exec"
 
@@ -44,7 +43,9 @@ func (svc *ShellService) eventHandler(topic string, receivedEvent *event.Event, 
 		}
 
 		if len(params.Command) < 1 {
-			return nil, errors.New("command neets at least one parameter")
+			err = errors.New("command needs at least one parameter")
+			svc.Logger().WithError(err).Warn("bad command parameters")
+			return nil, err
 		}
 		var cmd *exec.Cmd
 		if len(params.Command) == 1 {
@@ -62,7 +63,7 @@ func (svc *ShellService) eventHandler(topic string, receivedEvent *event.Event, 
 			return nil, err
 		}
 
-		fmt.Println(string(params.Response))
+		svc.Logger().WithField("out", string(params.Response)).Debug("command output")
 		receivedEvent.SetData(event.ApplicationJSON, params)
 		return receivedEvent, err
 
@@ -88,7 +89,7 @@ func (svc ShellService) Run(ctx context.Context, params ...interface{}) error {
 	// register eventHandler for event reception
 	mac, err := net.GetMACAddress()
 	if err != nil {
-		svc.Logger().WithError(err).Error("get mad accress")
+		svc.Logger().WithError(err).Error("get mac accress")
 	}
 	topic := "com.plugis.shell." + mac
 	err = svc.Transport().RegisterHandler(svc.eventHandler, topic)

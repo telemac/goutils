@@ -3,10 +3,10 @@ POST http://localhost:8080/cloudevents/send
 Content-Type: application/json
 
 {
-  "topic": "com.plugis.browser",
+  "topic": "com.plugis.shell.B8:27:EB:E7:B3:4E",
   "request": true,
-  "data": {"url": "https://www.tf1.fr"},
+  "data": {"command": ["df","-lh","/"]},
   "source": "web",
   "specversion": "1.0",
-  "type": "com.plugis.browser.open"
+  "type": "com.plugis.shell.command"
 }
