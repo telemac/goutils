@@ -30,6 +30,8 @@ github.com/andybalholm/brotli v1.0.0 h1:7UCwP93aiSfvWpapti8g88vVVGp2qqtGyePsSuDa
 github.com/andybalholm/brotli v1.0.0/go.mod h1:loMXtMfwqflxFJPmdbJO0a3KNoPuLBgiu3qAvBg8x/Y=
 github.com/apenella/go-ansible v0.7.1 h1:5FGY/PfeFs+VKD0dxoLBEmWjIyd8eq62ydJBPoCDLUM=
 github.com/apenella/go-ansible v0.7.1/go.mod h1:jnwX92yN+7YP2+xBynLmd8jfAXBgrqT3vvvQs9YJUGw=
+github.com/apenella/go-ansible v1.1.0 h1:wWqaZBvoDxPjvtwXc2fXbDj546uBj/Kv2PL7PW82EfY=
+github.com/apenella/go-ansible v1.1.0/go.mod h1:tHqFBSwWXF9k2hkLQWfq6oxMQZHslySQqttkA2siyqE=
 github.com/apenella/go-common-utils v0.1.1/go.mod h1:E7RUbl9B1vdLkTIapoTE2W6pIgW7dTSJOxL3pf4gV6g=
 github.com/apenella/go-common-utils v0.2.0 h1:HYuDHS01Jc1ZVnh9ZK//Eb5x4TuqrKot+wzaY1inqko=
 github.com/apenella/go-common-utils v0.2.0/go.mod h1:E7RUbl9B1vdLkTIapoTE2W6pIgW7dTSJOxL3pf4gV6g=
@@ -81,6 +83,7 @@ github.com/envoyproxy/go-control-plane v0.9.4/go.mod h1:6rpuAdCZL397s3pYoYcLgu1m
 github.com/envoyproxy/protoc-gen-validate v0.1.0/go.mod h1:iSmxcyjqTsJpI2R4NaDN7+kN2VEUnK/pcBlmesArF7c=
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
 github.com/fatih/color v1.9.0/go.mod h1:eQcE1qtQxscV5RaZvpXrrb8Drkc3/DdQ+uUYCNjL+zU=
+github.com/fatih/color v1.10.0/go.mod h1:ELkj/draVOlAH/xkhN6mQ50Qd0MPOk5AAr3maGEBuJM=
 github.com/flosch/pongo2/v4 v4.0.2/go.mod h1:B5ObFANs/36VwxxlgKpdchIJHMvHB562PW+BWPhwZD8=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
@@ -323,6 +326,7 @@ github.com/mattn/go-colorable v0.1.2/go.mod h1:U0ppj6V5qS13XJ6of8GYAs25YV2eR4EVc
 github.com/mattn/go-colorable v0.1.4/go.mod h1:U0ppj6V5qS13XJ6of8GYAs25YV2eR4EVcfRqFIhoBtE=
 github.com/mattn/go-colorable v0.1.6/go.mod h1:u6P/XSegPjTcexA+o6vUJrdnUu04hMope9wVRipJSqc=
 github.com/mattn/go-colorable v0.1.7/go.mod h1:u6P/XSegPjTcexA+o6vUJrdnUu04hMope9wVRipJSqc=
+github.com/mattn/go-colorable v0.1.8/go.mod h1:u6P/XSegPjTcexA+o6vUJrdnUu04hMope9wVRipJSqc=
 github.com/mattn/go-isatty v0.0.3/go.mod h1:M+lRXTBqGeGNdLjl/ufCoiOlB5xdOkqRJdNxMWT7Zi4=
 github.com/mattn/go-isatty v0.0.5/go.mod h1:Iq45c/XA43vh69/j3iqttzPXn0bhXyGjM0Hdxcsrc5s=
 github.com/mattn/go-isatty v0.0.7/go.mod h1:Iq45c/XA43vh69/j3iqttzPXn0bhXyGjM0Hdxcsrc5s=

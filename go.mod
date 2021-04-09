@@ -3,7 +3,7 @@ module github.com/telemac/goutils
 go 1.16
 
 require (
-	github.com/apenella/go-ansible v0.7.1
+	github.com/apenella/go-ansible v1.1.0
 	github.com/apenella/go-common-utils v0.2.0 // indirect
 	github.com/apenella/go-common-utils/error v0.0.0-20210101160429-a7ae7d856d3e // indirect
 	github.com/cloudevents/sdk-go/protocol/nats/v2 v2.3.1
