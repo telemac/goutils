@@ -3,6 +3,7 @@ package logger
 import (
 	"context"
 	"github.com/sirupsen/logrus"
+	"io"
 )
 
 var contextKey struct{} // context key
@@ -36,9 +37,14 @@ func WithLogger(ctx context.Context, entry *logrus.Entry) context.Context {
 }
 
 // FromContext returns the logger set with WithLogger or nil
-func FromContext(ctx context.Context) *logrus.Entry {
+func FromContext(ctx context.Context, noopLogger bool) *logrus.Entry {
 	entry, ok := ctx.Value(contextKey).(*logrus.Entry)
 	if !ok {
+		if noopLogger {
+			l := logrus.New()
+			l.SetOutput(io.Discard)
+			return l.WithField("no-op-logger", true)
+		}
 		return nil
 	}
 	return entry
