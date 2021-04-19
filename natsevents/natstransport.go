@@ -11,6 +11,7 @@ import (
 	"github.com/jimlawless/whereami"
 	"github.com/nats-io/nats.go"
 	log "github.com/sirupsen/logrus"
+	net2 "github.com/telemac/goutils/net"
 	"net"
 	"net/url"
 	"reflect"
@@ -231,26 +232,47 @@ func (t *NatsTransport) processNatsMessage(cloudEventHandler CloudEventHandler, 
 		// call with decoded event
 		responseEvent, handlerErr = cloudEventHandler(msg.Subject, requestEvent, nil, nil)
 	}
-	if err != nil {
+	if handlerErr != nil {
+		// TODO : report this error
 		log.WithError(handlerErr).WithField("request", requestEvent).Warn("event handler error")
 	}
 
-	if msg.Reply != "" {
+	if msg.Reply != "" && (responseEvent != nil || handlerErr != nil) {
 		// the reply of a cloudevent request must be a valid cloud event.
 
 		if responseEvent == nil {
-			// TODO : handle response with no event
-			responseEvent = t.NewEvent("", "eventType", 666)
+			// handle response with no event
+			responseEvent = t.NewEvent("", requestEvent.Type()+".response", nil)
+			EventFillDefaults(responseEvent)
 		}
 
-		var payload []byte
+		responseEvent.SetExtension("responsefor", requestEvent.ID())
 		if handlerErr != nil {
-			// TODO : handle cloudEventHandler error!=nil
+			responseEvent.SetExtension("error", handlerErr.Error())
 		}
+		mac, err := net2.GetMACAddress()
+		if err != nil {
+			log.WithError(err).Error("get mac address")
+		}
+		responseEvent.SetExtension("mac", mac)
+
+		var payload []byte
 		if responseEvent != nil {
 			payload, err = responseEvent.MarshalJSON()
 			if err != nil {
 				// TODO : handle json format errors here
+				log.WithError(err).Error("MarshalJSON cloudevent response")
+
+				err = responseEvent.Validate()
+				if err != nil {
+					log.WithError(err).Error("response event validation")
+				}
+
+				responseEvent.SetData(cloudevents.ApplicationJSON, err.Error())
+				payload, err = responseEvent.MarshalJSON()
+				if err != nil {
+					log.WithError(err).Error("MarshalJSON cloudevent response error")
+				}
 			}
 		}
 		err = msg.Respond(payload)
@@ -348,5 +370,8 @@ func EventFillDefaults(e *event.Event) {
 	}
 	if types.IsZero(e.Time()) {
 		e.SetTime(time.Now())
+	}
+	if e.Source() == "" {
+		e.SetSource(whereami.WhereAmI(2))
 	}
 }

@@ -1,0 +1,5 @@
+postgres:
+  database: plugis
+  user:     plugis
+  password: plugis
+  port:     5432
