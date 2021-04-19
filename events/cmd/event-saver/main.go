@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	config, err := natsservice.LoadConfig("./event-saver.yml")
+	config, err := natsservice.LoadConfig("./servers.yml", "./postgresql.yml")
 	//err := configor.Load(&Config, "./event-saver.yml")
 	if err != nil {
 		logrus.WithError(err).Warn("load configuration file")
