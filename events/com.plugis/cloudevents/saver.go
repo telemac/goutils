@@ -28,14 +28,17 @@ func (svc *CloudEventSaver) Logger() *logrus.Entry {
 func (svc *CloudEventSaver) eventHandler(topic string, receivedEvent *event.Event, payload []byte, err error) (*event.Event, error) {
 	// save cloudevent to database
 	err = svc.db.InsertEvent(topic, receivedEvent, payload, err)
+	logger := svc.Logger().WithFields(logrus.Fields{
+		"topic":   topic,
+		"event":   receivedEvent,
+		"payload": string(payload),
+		"error":   err,
+	})
+	logger.Debug("received event")
 	if err != nil {
-		svc.Logger().WithFields(logrus.Fields{
-			"topic":   topic,
-			"event":   receivedEvent,
-			"payload": string(payload),
-			"error":   err,
-		}).Error("log cloudevent to database")
+		logger.Error("log cloudevent to database")
 	}
+	// TODO : don't send a response to any request
 	return nil, nil
 }
 
