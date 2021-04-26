@@ -33,7 +33,7 @@ func New() *Ansible {
 
 func (a *Ansible) InstallPackages(packages string) error {
 	if packages != "" {
-		out, _, err := command([]string{"sh", "-c", "apt install -y " + packages})
+		out, _, err := command([]string{"sh", "-c", "apt update && apt install -y " + packages})
 		if err != nil {
 			return fmt.Errorf("apt install error %w (%s)", err, out)
 		}
@@ -75,7 +75,7 @@ func (a *Ansible) RunPlaybook(ctx context.Context, base, playbookUrl, inventory 
 
 	ansiblePlaybookConnectionOptions := &options.AnsibleConnectionOptions{
 		Connection: "local",
-		User:       "root",
+		//		User:       "root",
 	}
 
 	ansiblePlaybookOptions := &playbook.AnsiblePlaybookOptions{
