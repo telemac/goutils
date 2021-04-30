@@ -1,0 +1,13 @@
+---
+
+- hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: json-stdout-ansibleplaybook
+      debug:
+        msg: Your are running 'json-stdout-ansibleplaybook' example
+
+    - name: my debug message
+      debug:
+        msg: second message

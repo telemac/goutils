@@ -4,3 +4,4 @@ macaddresses.sql
 /mysql.yml
 /servers.yml
 colorbeam/
+heartbeat-saver
