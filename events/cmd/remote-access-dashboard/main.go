@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	config, err := natsservice.LoadConfig("./remote-access-dashboard.yml")
+	config, err := natsservice.LoadConfig("servers.yml", "mysql.yml")
 	if err != nil {
 		logrus.WithError(err).Fatal("open config file")
 	}
@@ -18,7 +18,7 @@ func main() {
 	ctx, cancel := task.NewCancellableContext(time.Second * 15)
 	defer cancel()
 
-	servicesRepository, err := natsservice.NewNatsServiceRepository("remote-access-dashboard", "https://nats1.plugis.com", "trace")
+	servicesRepository, err := natsservice.NewNatsServiceRepository("remote-access-dashboard", config.Servers[0].Url, config.CommandLineParams.Log)
 	if err != nil {
 		logrus.WithError(err).Fatal("create nats service repository")
 	}
@@ -28,7 +28,8 @@ func main() {
 
 	servicesRepository.Start(ctx, heartbeat.NewHeartbeatWebInterface(config.Mysql))
 
-	//servicesRepository.Start(ctx, &browser.BrowserService{})
+	// start heartbeat saver
+	servicesRepository.Start(ctx, heartbeat.NewHeartbeatSaver(config.Mysql))
 
 	servicesRepository.WaitUntilAllDone()
 

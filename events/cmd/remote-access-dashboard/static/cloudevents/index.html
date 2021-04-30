@@ -1,10 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <script src="/js/cloudevents.js"></script>
+    <title>CloudEvents</title>
+    <script>
+        let ce = new CloudEvents()
+    </script>
 </head>
 <body>
-$END$
+    <h1>CloudEvents</h1>
+    <button onclick="ce.send('com.plugis.shell.command', {command:['killall','remote-access']}, 'com.plugis.shell.F0:18:98:EA:3A:32') ">kill remote access colorbeam</button>
+    <br>
+    <button onclick="ce.send('com.plugis.shell.command', {command:['killall','remote-access']}, 'com.plugis.shell.38:C9:86:41:88:91') ">kill remote access mac patrick</button>
+    <br>
+    <button onclick="ce.send('com.plugis.browser.open', {url:'https://www.tf1.fr'}, 'com.plugis.browser.F0:18:98:EA:3A:32') ">browser alex</button>
+
 </body>
 </html>
