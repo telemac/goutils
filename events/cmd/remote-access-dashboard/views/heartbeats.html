@@ -17,6 +17,31 @@
     <script>
         setInterval(() => window.location.reload(),60*1000)
     </script>
+    <script>
+
+        function SendAnsibleInstall(mac) {
+            let ce = new CloudEvents()
+            let data = {
+                packages: "ansible sshpass aptitude git wget",
+                roles: "geerlingguy.pip geerlingguy.docker_arm",
+                base: "",
+                inventory: "https://update.cb-na.cloud/ansible/local.yml",
+                playbooks: ["https://update.cb-na.cloud/ansible/clone.yml", "/tmp/v2-ansible/playbooks/first_install.yml"]
+            }
+            ce.send('com.plugis.ansible.playbook', data, 'com.plugis.ansible.'+mac)
+        }
+
+        function SendAptUpdate(mac) {
+            let ce = new CloudEvents()
+            let data = {
+                command: ["apt","update"]
+            }
+            ce.send('com.plugis.shell.command', data, 'com.plugis.shell.'+mac)
+        }
+
+    </script>
+    <script src="/js/cloudevents.js"></script>
+
 {{end}}
 
 {{define "content"}}
@@ -28,8 +53,10 @@
                 <th>comment</th>
                 <th>ip</th>
                 <th>hostname</th>
+                <th>first_heartbeat</th>
                 <th>last_heartbeat</th>
                 <th>elapsed</th>
+                <th>CloudEvent</th>
             </tr>
         </thead>
         <tbody>
@@ -40,8 +67,13 @@
                 <td>{{ .comment }}</td>
                 <td>{{ .ip }}</td>
                 <td>{{ .hostname }}</td>
+                <td>{{ .first_heartbeat }}</td>
                 <td>{{ .last_heartbeat }}</td>
                 <td>{{ .elapsed }}</td>
+                <td>
+                    <button onclick="if (confirm('Lancer l\'installation ?')) SendAnsibleInstall({{ .mac }})">Install</button>
+                    <button onclick="if (confirm('Lancer l\'update ?')) SendAptUpdate({{ .mac }})">apt update</button>
+                </td>
             </tr>
 {{end}}
         </tbody>
@@ -49,4 +81,4 @@
 {{end}}
 
 <h1>{{ .Path }}</h1>
-{{ template "base" . }}
+{{- template "base" . }}
