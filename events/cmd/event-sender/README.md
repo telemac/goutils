@@ -15,6 +15,7 @@
 
 ./event-sender -type 'com.plugis.shell.command' -data '{"command": ["sudo","reboot"]}' -topic "com.plugis.shell.B8:27:EB:2C:83:55" -request
 
+./event-sender -type 'com.plugis.shell.command' -data '{"command": ["sh","-c","apt install -y ansible"]}' -topic "com.plugis.shell.8E:82:45:0E:A4:6F" -request -timeout 300
 
 
 ```
