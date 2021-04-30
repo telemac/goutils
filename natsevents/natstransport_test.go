@@ -30,7 +30,7 @@ func TestNewNatsTransport(t *testing.T) {
 	transport, err = NewNatsTransport("nats://cloud1.idronebox.com:443")
 	assert.NoError(err)
 	assert.True(transport.Connected())
-	transport, err = NewNatsTransport("nats://nats1.plugis.com:443")
+	transport, err = NewNatsTransport("nats://server1.plugis.com:443")
 	assert.NoError(err)
 	assert.True(transport.Connected())
 
@@ -83,7 +83,7 @@ func TestNewNatsTransport(t *testing.T) {
 		event.SetID(uuid.New().String())
 		event.SetTime(time.Now())
 		event.SetData(cloudevents.ApplicationJSON, count)
-		err = transport.Send(ctx, event, "events.test")
+		err = transport.Send(ctx, &event, "events.test")
 		//assert.NoError(err, "transport.Send")
 		if err != nil {
 			logrus.WithError(err).Error("transport.Send")
@@ -125,7 +125,7 @@ func TestNatsTransport_Request(t *testing.T) {
 	ce.SetID(uuid.New().String())
 	ce.SetTime(time.Now())
 	ce.SetData(cloudevents.ApplicationJSON, req)
-	responseCloudEvent, err := transport.Request(ctx, ce, "events.request", time.Second)
+	responseCloudEvent, err := transport.Request(ctx, &ce, "events.request", time.Second)
 	assert.True(errors.Is(err, nats.ErrTimeout))
 
 	// add handler
@@ -164,7 +164,7 @@ func TestNatsTransport_Request(t *testing.T) {
 	assert.NoError(err)
 
 	ce.SetSource("")
-	responseCloudEvent, err = transport.Request(ctx, ce, "events.request", time.Second)
+	responseCloudEvent, err = transport.Request(ctx, &ce, "events.request", time.Second)
 	assert.NoError(err)
 
 	assert.NotNil(responseCloudEvent)
