@@ -18,6 +18,10 @@ type HeartbeatSender struct {
 	sentEventData *Sent
 }
 
+func NewHeartbeatSender(period int, randomPeriod int) *HeartbeatSender {
+	return &HeartbeatSender{Period: period, RandomPeriod: randomPeriod}
+}
+
 func (svc *HeartbeatSender) Logger() *logrus.Entry {
 	return svc.NatsService.Logger().WithField("nats-service", reflect.TypeOf(*svc).String())
 }
