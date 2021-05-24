@@ -40,6 +40,7 @@ func TestNewUDPBroadcaster(t *testing.T) {
 	assert.Contains(datagram.Addr.String(), ":50222")
 
 	datagram, err = udpBroadcaster.Read(time.Millisecond * 100)
+	_ = datagram
 	assert.True(errors.Is(err, os.ErrDeadlineExceeded))
 	<-ctx.Done()
 

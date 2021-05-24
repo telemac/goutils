@@ -50,6 +50,7 @@ func (t *NatsTransport) Close() error {
 	defer t.mutex.RUnlock()
 
 	for _, natsSubscription := range t.subscriptions {
+		//nolint:errcheck
 		natsSubscription.subscription.Drain()
 		// wait until all pending messages received
 		for {

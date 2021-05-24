@@ -2,7 +2,6 @@ package ansible
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/cloudevents/sdk-go/v2/event"
@@ -64,14 +63,14 @@ func (svc *AnsibleService) eventHandler(topic string, receivedEvent *event.Event
 		receivedEvent.SetTime(time.Now())
 		receivedEvent.SetID(uuid.NewString())
 		mac, _ := net.GetMACAddress()
-		receivedEvent.SetData(cloudevents.ApplicationJSON, "ma réponse de "+mac)
+		_ = receivedEvent.SetData(cloudevents.ApplicationJSON, "ma réponse de "+mac)
 
 		return receivedEvent, err
 	default:
 		return nil, fmt.Errorf("unknown event type %s", receivedEvent.Type())
 	}
 
-	return nil, errors.New("unattainable code")
+	// return nil, errors.New("unattainable code")
 }
 
 func (svc AnsibleService) Run(ctx context.Context, params ...interface{}) error {

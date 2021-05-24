@@ -64,6 +64,7 @@ func (svc *ShellService) eventHandler(topic string, receivedEvent *event.Event, 
 		}
 
 		svc.Logger().WithField("out", string(params.Response)).Debug("command output")
+		// nolint:errcheck
 		receivedEvent.SetData(event.ApplicationJSON, params)
 		return receivedEvent, err
 

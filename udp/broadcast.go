@@ -57,7 +57,10 @@ func (ub *UDPBroadcaster) Broadcast(databram []byte) error {
 }
 
 func (ub *UDPBroadcaster) Read(timeout time.Duration) (*UDPDatagram, error) {
-	ub.listener.SetReadDeadline(time.Now().Add(timeout))
+	err := ub.listener.SetReadDeadline(time.Now().Add(timeout))
+	if err != nil {
+		return nil, err
+	}
 	n, addr, err := ub.listener.ReadFrom(ub.buffer)
 	if n > 0 {
 		datagram := new(UDPDatagram)
@@ -79,5 +82,5 @@ func Broadcast(addrAndPort string, buffer []byte) error {
 	if n != len(buffer) {
 		return errors.New("partial send")
 	}
-	return nil
+	return err
 }
