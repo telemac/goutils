@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"github.com/telemac/goutils/events/cmd/event-sender/config"
+	"github.com/telemac/goutils/natsevents"
 	"github.com/telemac/goutils/natsservice"
 	"github.com/telemac/goutils/task"
 	"time"
@@ -35,7 +36,7 @@ func main() {
 
 	topic := commandLineParams.Topic
 
-	cloudEvent := servicesRepository.Transport().NewEvent("", eventType, obj)
+	cloudEvent := natsevents.NewEvent("", eventType, obj)
 
 	if commandLineParams.Request {
 		ev, err := servicesRepository.Transport().Request(ctx, cloudEvent, topic, time.Second*time.Duration(commandLineParams.Timeout))

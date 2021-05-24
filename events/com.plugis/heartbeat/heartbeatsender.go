@@ -3,6 +3,7 @@ package heartbeat
 import (
 	"context"
 	"github.com/sirupsen/logrus"
+	"github.com/telemac/goutils/natsevents"
 	"math/rand"
 	"reflect"
 	"time"
@@ -33,7 +34,7 @@ func (svc *HeartbeatSender) SendHeartbeatEvent(ctx context.Context) error {
 	// update event data field
 	svc.sentEventData.Uptime = uint64(time.Since(svc.sentEventData.Started).Seconds())
 
-	heartbeatEvent := t.NewEvent("com.plugis.", "", svc.sentEventData)
+	heartbeatEvent := natsevents.NewEvent("com.plugis.", "", svc.sentEventData)
 	topic := heartbeatEvent.Type() + "." + svc.sentEventData.Mac
 	err = t.Send(ctx, heartbeatEvent, topic)
 	svc.Logger().WithFields(logrus.Fields{"event": heartbeatEvent, "topic": topic}).Trace("send event")

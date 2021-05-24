@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"github.com/telemac/goutils/events/com.plugis/shell"
+	"github.com/telemac/goutils/natsevents"
 	"github.com/telemac/goutils/natsservice"
 	"github.com/telemac/goutils/task"
 	"time"
@@ -26,7 +27,7 @@ func main() {
 	servicesRepository.Start(ctx, &shell.ShellService{})
 
 	cmd := shell.ShellCommandParams{Command: []string{"df", "-lh", "/"}}
-	cmdEvent := servicesRepository.Transport().NewEvent("com.plugis.", "shell.command", cmd)
+	cmdEvent := natsevents.NewEvent("com.plugis.", "shell.command", cmd)
 
 	resp, err := servicesRepository.Transport().Request(ctx, cmdEvent, "com.plugis.shell", time.Second*5)
 	if err != nil {
