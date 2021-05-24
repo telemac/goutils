@@ -72,7 +72,8 @@ func (su *SelfUpdater) NeedsUpdate() (bool, error) {
 	if err != nil {
 		return false, fmt.Errorf("get local md5 : %w", err)
 	}
-	return strings.ToUpper(localMD5) != strings.ToUpper(remoteMD5), nil
+	return !strings.EqualFold(localMD5, remoteMD5), nil
+	// return strings.ToUpper(localMD5) != strings.ToUpper(remoteMD5), nil
 }
 
 // SelfUpdate updates the current binary
@@ -184,7 +185,7 @@ func downloadAndReplace(url string) error {
 	defer resp.Body.Close()
 	err = apply(resp.Body)
 	if err != nil {
-		// error handling
+		// TODO : error handling
 	}
 	return err
 }
@@ -207,7 +208,7 @@ func apply(update io.Reader) error {
 
 	// Copy the contents of newbinary to a new executable file
 	newPath := filepath.Join(updateDir, fmt.Sprintf(".%s.new", filename))
-	fp, err := os.OpenFile(newPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 775)
+	fp, err := os.OpenFile(newPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0775)
 	if err != nil {
 		return err
 	}
