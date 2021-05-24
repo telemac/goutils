@@ -20,7 +20,10 @@ func main() {
 
 	servicesRepository, err := natsservice.NewNatsServiceRepository("remote-access-dashboard", config.Servers[0].Url, config.CommandLineParams.Log)
 	if err != nil {
-		logrus.WithError(err).Fatal("create nats service repository")
+		logrus.WithFields(logrus.Fields{
+			"servers": config.Servers[0].Url,
+			"error":   err,
+		}).Fatal("create nats service repository")
 	}
 	defer servicesRepository.Close(time.Second * 10)
 
