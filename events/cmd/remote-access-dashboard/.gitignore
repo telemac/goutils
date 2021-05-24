@@ -2,3 +2,5 @@ colorbeam/
 deploy_cbna.sh
 remote-access-dashboard
 web
+deploy_dronebox.sh
+
