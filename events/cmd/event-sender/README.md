@@ -19,3 +19,8 @@
 
 
 ```
+
+## add the command on osX
+```shell
+sudo ln -s event-sender /usr/local/bin/event-sender
+```
