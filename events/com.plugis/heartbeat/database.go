@@ -84,7 +84,7 @@ func (d *Database) getHeartbeats(valid bool) ([]map[string]interface{}, error) {
 	//		return nil, tx.Error
 	//	}
 	var dest []map[string]interface{}
-	err := d.db.Table("heartbeats").Order("last_heartbeat desc").Select("*,TIMEDIFF(now(),last_heartbeat) as elapsed").Find(&dest).Error
+	err := d.db.Table("heartbeats").Order("first_heartbeat desc").Select("*,TIMEDIFF(now(),last_heartbeat) as elapsed").Find(&dest).Error
 	if err != nil {
 		return nil, err
 	}
