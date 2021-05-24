@@ -4,6 +4,13 @@ import (
 	"context"
 	"crypto/tls"
 	"errors"
+	"net"
+	"net/url"
+	"reflect"
+	"strings"
+	"sync"
+	"time"
+
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/cloudevents/sdk-go/v2/event"
 	"github.com/cloudevents/sdk-go/v2/types"
@@ -12,12 +19,6 @@ import (
 	"github.com/nats-io/nats.go"
 	log "github.com/sirupsen/logrus"
 	net2 "github.com/telemac/goutils/net"
-	"net"
-	"net/url"
-	"reflect"
-	"strings"
-	"sync"
-	"time"
 )
 
 // NatsTransport allows to send and receive CloudEvents on nats
@@ -242,7 +243,7 @@ func (t *NatsTransport) processNatsMessage(cloudEventHandler CloudEventHandler, 
 
 		if responseEvent == nil {
 			// handle response with no event
-			responseEvent = t.NewEvent("", requestEvent.Type()+".response", nil)
+			responseEvent = NewEvent("", requestEvent.Type()+".response", nil)
 			EventFillDefaults(responseEvent)
 		}
 
@@ -343,7 +344,7 @@ func FromContext(ctx context.Context) *NatsTransport {
 }
 
 // NewEvent creates a cloud event given minimal parameters
-func (t *NatsTransport) NewEvent(eventPrefix, eventType string, obj interface{}) *event.Event {
+func NewEvent(eventPrefix, eventType string, obj interface{}) *event.Event {
 	e := event.New(event.CloudEventsVersionV1)
 	if eventType != "" {
 		e.SetType(eventPrefix + eventType)
