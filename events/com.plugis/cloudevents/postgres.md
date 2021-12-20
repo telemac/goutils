@@ -19,6 +19,11 @@ CREATE TABLE IF NOT EXISTS public.cloudevents (
     specversion varchar
 );
 
+-- create indexes
+create index time_idx  on public.cloudevents(time);
+create index type_idx  on public.cloudevents(type);
+create index topic_idx  on public.cloudevents(topic);
+
 -- create plugis user and give access rights
 create user plugis with encrypted password 'plugis';
 -- change password if needed
@@ -40,6 +45,23 @@ select distinct data->'mac' as hostname,data->'started' as started from cloudeve
 
 -- show windspeed
 select time,jsonb_array_element(data,1)->'value' as windspeed from cloudevents where topic='com.drone-box.box.1' and type='com.drone-box.weather.tempest.RapidWind'
+
+-- select the first variable of the array, sample request
+select time,name,value from (
+                                                 select time,topic,jsonb_array_element(data,0)->'name'->>0 as name,jsonb_array_element(data,0)->'value'->>0 as value from public.cloudevents
+                                                 where type='com.plugis.variable.set' and time > now() - interval '30 minute'
+                                             ) as VARIABLES
+where name='tempest.ST-00030095.solar-radiation' and value::integer < 600
+order by time desc
+
+-- potentiel solar production sample
+select time,name,value::numeric*14.5,pg_typeof(value) from (
+                                                               select time,topic,jsonb_array_element(data,0)->'name'->>0 as name,jsonb_array_element(data,0)->'value'->>0 as value from public.cloudevents
+                                                               where type='com.plugis.variable.set' and time > now() - interval '300 minute'
+                                                           ) as VARIABLES
+where name='tempest.ST-00030095.solar-radiation'
+order by time desc
+limit 10
 
 -- get last heartbeats
 select data->'mac' as mac,max(time) as last,min(time) as first from cloudevents where type='com.plugis.heartbeat.Sent' group by mac

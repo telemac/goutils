@@ -2,19 +2,20 @@ package cloudevents
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/cloudevents/sdk-go/v2/event"
 	"github.com/google/uuid"
 	"github.com/telemac/goutils/natsservice"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"time"
 )
 
-type Database struct {
+type CloudEventsDatabase struct {
 	db *gorm.DB
 }
 
-func (d *Database) Open(dbConfig natsservice.PostgresConfig) error {
+func (d *CloudEventsDatabase) Open(dbConfig natsservice.PostgresConfig) error {
 	// make logger dsn
 	dsn := fmt.Sprintf(
 		"user=%s password=%s host=%s port=%d dbname=%s sslmode=disable TimeZone=Europe/Paris",
@@ -44,13 +45,13 @@ func (d *Database) Open(dbConfig natsservice.PostgresConfig) error {
 	return d.db.Exec(createTableSql).Error
 }
 
-func (d *Database) InsertEvent(topic string, e *event.Event, payload []byte, err error) error {
+func (d *CloudEventsDatabase) InsertEvent(topic string, e *event.Event, payload []byte, err error) error {
 	if err != nil { // malformed event
 		const insertSql = `insert into public.cloudevents (id, time, type, topic) values (?,?,?,'{}')`
 		id := uuid.NewString()
 		t := time.Now()
 		eventType := "malformed"
-		return d.db.Exec(insertSql, id, t, eventType, topic).Error
+		return d.db.Exec(insertSql, id, t, eventType, topic, payload).Error
 	}
 	const insertSql = `insert into public.cloudevents (id, time, type, topic, data, datacontenttype, source, specversion) values (?,?,?,?,?,?,?,?)`
 	return d.db.Exec(insertSql, e.ID(), e.Time(), e.Type(), topic, e.Data(), e.DataContentType(), e.Source(), e.SpecVersion()).Error

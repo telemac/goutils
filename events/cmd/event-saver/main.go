@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	config, err := natsservice.LoadConfig("servers.yml", "postgresql.yml")
+	config, err := natsservice.LoadConfig("servers.yml", "postgresql.yml", "mysql.yml")
 	//err := configor.Load(&Config, "./event-saver.yml")
 	if err != nil {
 		logrus.WithError(err).Warn("load configuration file")
@@ -21,7 +21,7 @@ func main() {
 	ctx, cancel := task.NewCancellableContext(time.Second * 15)
 	defer cancel()
 
-	servicesRepository, err := natsservice.NewNatsServiceRepository("event-saver", config.Servers[0].Url, "trace")
+	servicesRepository, err := natsservice.NewNatsServiceRepository("event-saver", config.Servers[0].Url, config.CommandLineParams.Log)
 	if err != nil {
 		logrus.WithError(err).Fatal("create nats service repository")
 	}
@@ -30,7 +30,7 @@ func main() {
 	servicesRepository.Logger().Info("service starting")
 
 	// start event-saver service
-	servicesRepository.Start(ctx, cloudevents.NewCloudEventSaver(config.Postgres))
+	servicesRepository.Start(ctx, cloudevents.NewCloudEventSaver(config.Postgres, config.Mysql))
 
 	servicesRepository.WaitUntilAllDone()
 
