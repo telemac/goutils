@@ -11,6 +11,7 @@ type Variable struct {
 	Name      string      `json:"name"`
 	Type      string      `json:"type"`
 	Value     interface{} `json:"value"`
+	Unit      string      `json:"unit,omitempty"`
 	Timestamp time.Time   `json:"ts,omitempty"`
 	Comment   string      `json:"comment,omitempty"`
 }
