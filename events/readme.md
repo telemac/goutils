@@ -43,3 +43,5 @@ nats sub '>'
 ## MQTT client with nats
 mosquitto_sub -h update.idronebox.com -t '#' -v -d -u <user> -P <password>
 
+## AsyncAPI with CloudEvents
+[Simulating CloudEvents with AsyncAPI and Microcks](https://developers.redhat.com/articles/2021/06/02/simulating-cloudevents-asyncapi-and-microcks#)
