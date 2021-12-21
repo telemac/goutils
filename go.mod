@@ -13,31 +13,38 @@ require (
 	github.com/cloudevents/sdk-go/v2 v2.4.1
 	github.com/gofiber/fiber/v2 v2.8.0
 	github.com/gofiber/template v1.6.8
-	github.com/golang/protobuf v1.5.1 // indirect
+	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.2.0
 	github.com/jackc/pgproto3/v2 v2.0.7 // indirect
 	github.com/jimlawless/whereami v0.0.0-20160417220522-aebf70d4a772
 	github.com/jinzhu/configor v1.2.1
-	github.com/json-iterator/go v1.1.11 // indirect
+	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
 	github.com/kardianos/service v1.2.0
-	github.com/klauspost/compress v1.12.2 // indirect
+	github.com/klauspost/compress v1.13.6 // indirect
+	github.com/kr/pretty v0.3.0 // indirect
 	github.com/lib/pq v1.10.0 // indirect
 	github.com/libp2p/go-reuseport v0.1.0
-	github.com/nats-io/jwt v1.2.2 // indirect
-	github.com/nats-io/nats.go v1.10.0
-	github.com/nats-io/nkeys v0.3.0 // indirect
+	github.com/minio/highwayhash v1.0.2 // indirect
+	github.com/nats-io/nats-server/v2 v2.6.6 // indirect
+	github.com/nats-io/nats.go v1.13.1-0.20211122170419-d7c1d78a50fc
+	github.com/rogpeppe/go-internal v1.8.0 // indirect
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
 	github.com/tevino/abool v1.2.0
 	github.com/valyala/fasthttp v1.24.0
 	github.com/valyala/tcplisten v1.0.0 // indirect
-	golang.org/x/crypto v0.0.0-20210421170649-83a5a9bb288b // indirect
+	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3 // indirect
 	golang.org/x/lint v0.0.0-20201208152925-83fdc39ff7b5 // indirect
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
 	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
+	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/time v0.0.0-20211116232009-f0f3c7e86c11 // indirect
 	golang.org/x/tools v0.0.0-20201211185031-d93e913c1a58 // indirect
+	google.golang.org/protobuf v1.27.1 // indirect
+	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 	gorm.io/driver/mysql v1.0.6
 	gorm.io/driver/postgres v1.0.8
 	gorm.io/gorm v1.21.9
