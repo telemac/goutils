@@ -1,0 +1,4 @@
+servers:
+#  - url: nats://server1.plugis.com:443
+  - url: nats://cloud1.idronebox.com:443
+    sni: true

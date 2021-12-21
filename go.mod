@@ -3,6 +3,8 @@ module github.com/telemac/goutils
 go 1.16
 
 require (
+	github.com/Allenxuxu/gev v0.3.0
+	github.com/Allenxuxu/ringbuffer v0.0.11 // indirect
 	github.com/andybalholm/brotli v1.0.2 // indirect
 	github.com/apenella/go-ansible v1.1.0
 	github.com/apenella/go-common-utils v0.2.0 // indirect
@@ -21,21 +23,19 @@ require (
 	github.com/kardianos/service v1.2.0
 	github.com/klauspost/compress v1.12.2 // indirect
 	github.com/lib/pq v1.10.0 // indirect
-	github.com/libp2p/go-reuseport v0.0.2
+	github.com/libp2p/go-reuseport v0.1.0
 	github.com/nats-io/jwt v1.2.2 // indirect
 	github.com/nats-io/nats.go v1.10.0
 	github.com/nats-io/nkeys v0.3.0 // indirect
 	github.com/sirupsen/logrus v1.8.1
-	github.com/stretchr/testify v1.6.1
+	github.com/stretchr/testify v1.7.0
 	github.com/tevino/abool v1.2.0
 	github.com/valyala/fasthttp v1.24.0
 	github.com/valyala/tcplisten v1.0.0 // indirect
-	go.uber.org/multierr v1.6.0 // indirect
-	go.uber.org/zap v1.16.0 // indirect
 	golang.org/x/crypto v0.0.0-20210421170649-83a5a9bb288b // indirect
 	golang.org/x/lint v0.0.0-20201208152925-83fdc39ff7b5 // indirect
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
-	golang.org/x/sys v0.0.0-20210426230700-d19ff857e887 // indirect
+	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
 	golang.org/x/tools v0.0.0-20201211185031-d93e913c1a58 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gorm.io/driver/mysql v1.0.6
