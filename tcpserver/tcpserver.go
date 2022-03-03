@@ -12,6 +12,10 @@ import (
 	"github.com/tevino/abool"
 )
 
+var (
+	ErrCancelled = errors.New("cancelled")
+)
+
 // TCPServer holds the data for our TCP Server
 type TCPServer struct {
 	wg         sync.WaitGroup // waitGroup for running goroutines
@@ -77,7 +81,7 @@ func (tcpServer *TCPServer) ListerAndServe(ctx context.Context, address string, 
 		conn, err := netListener.Accept()
 		if err != nil {
 			if interrupted.IsSet() {
-				return errors.New("cancelled")
+				return ErrCancelled
 			}
 			return err
 		}
