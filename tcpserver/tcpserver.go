@@ -18,9 +18,9 @@ var (
 
 // TCPServer holds the data for our TCP Server
 type TCPServer struct {
-	wg         sync.WaitGroup // waitGroup for running goroutines
 	accepted   int64          // Nb of accepted connexions
 	goroutines int64          // Nb active goroutines handling connections
+	wg         sync.WaitGroup // waitGroup for running goroutines
 	tlsConfig  *tls.Config    // tlsConfig parameters, TLS if set
 }
 
