@@ -9,8 +9,8 @@ require (
 	github.com/apenella/go-ansible v1.1.0
 	github.com/apenella/go-common-utils v0.2.0 // indirect
 	github.com/apenella/go-common-utils/error v0.0.0-20210101160429-a7ae7d856d3e // indirect
-	github.com/cloudevents/sdk-go/protocol/nats/v2 v2.3.1
-	github.com/cloudevents/sdk-go/v2 v2.4.1
+	github.com/cloudevents/sdk-go/protocol/nats/v2 v2.8.0
+	github.com/cloudevents/sdk-go/v2 v2.8.0
 	github.com/gofiber/fiber/v2 v2.8.0
 	github.com/gofiber/template v1.6.8
 	github.com/golang/protobuf v1.5.2 // indirect
@@ -26,15 +26,15 @@ require (
 	github.com/lib/pq v1.10.0 // indirect
 	github.com/libp2p/go-reuseport v0.1.0
 	github.com/minio/highwayhash v1.0.2 // indirect
-	github.com/nats-io/nats-server/v2 v2.6.6 // indirect
-	github.com/nats-io/nats.go v1.13.1-0.20211122170419-d7c1d78a50fc
+	github.com/nats-io/jwt/v2 v2.2.0 // indirect
+	github.com/nats-io/nats.go v1.13.0
 	github.com/rogpeppe/go-internal v1.8.0 // indirect
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
 	github.com/tevino/abool v1.2.0
 	github.com/valyala/fasthttp v1.24.0
 	github.com/valyala/tcplisten v1.0.0 // indirect
-	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3 // indirect
+	golang.org/x/crypto v0.0.0-20220214200702-86341886e292 // indirect
 	golang.org/x/lint v0.0.0-20201208152925-83fdc39ff7b5 // indirect
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
 	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
