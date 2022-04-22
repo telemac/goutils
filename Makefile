@@ -2,11 +2,11 @@
 
 # lint the source tree
 lint:
-	golangci-lint run --enable-all --disable lll
+	CGOENAGLE=0 GODEBUG=netdns=go golangci-lint run --enable-all --disable lll
 
 # test runs tests
 test:
-	go test -v ./...
+	CGOENAGLE=0 GODEBUG=netdns=go go test -race ./...
 
 # list available updates in packages
 list:
