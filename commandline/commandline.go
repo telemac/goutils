@@ -15,4 +15,5 @@ func Parse() (commandLine CommandLine) {
 	flag.StringVar(&commandLine.Log, "log", "info", "log level (trace|debug|info|warn|error|fatal)")
 	flag.StringVar(&commandLine.ConfigFolder, "config", "./", "config file directory path")
 	flag.Parse()
+	return
 }
