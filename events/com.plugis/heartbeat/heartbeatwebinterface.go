@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"time"
+
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/cloudevents/sdk-go/v2/types"
 	"github.com/gofiber/fiber/v2"
@@ -11,7 +13,6 @@ import (
 	"github.com/telemac/goutils/natsservice"
 	"github.com/telemac/goutils/webserver"
 	"github.com/valyala/fasthttp"
-	"time"
 )
 
 // HeartbeatWebInterface exposes com.plugis.heartbeat.Sent events
@@ -162,7 +163,9 @@ func (svc *HeartbeatWebInterface) Run(ctx context.Context, params ...interface{}
 		}
 
 		duration := time.Second * time.Duration(timeout)
-		ctx, _ := context.WithTimeout(context.TODO(), duration)
+		// call cancel function when done
+		ctx, cancel := context.WithTimeout(context.TODO(), duration)
+		defer cancel()
 		if request {
 			returnedEvent, err := svc.Transport().Request(ctx, &ce, topic, duration)
 			if err != nil {
