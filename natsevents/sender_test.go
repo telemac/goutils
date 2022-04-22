@@ -3,6 +3,10 @@ package natsevents
 import (
 	"context"
 	"fmt"
+	"sync/atomic"
+	"testing"
+	"time"
+
 	cenats "github.com/cloudevents/sdk-go/protocol/nats/v2"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/cloudevents/sdk-go/v2/event"
@@ -10,8 +14,6 @@ import (
 	"github.com/nats-io/nats.go"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"testing"
-	"time"
 )
 
 func TestNewCloudEventNats(t *testing.T) {
@@ -21,7 +23,7 @@ func TestNewCloudEventNats(t *testing.T) {
 
 	const ITERATIONS = 100
 
-	var counter int
+	var counter int32
 	type Count struct {
 		N int
 	}
@@ -53,7 +55,7 @@ func TestNewCloudEventNats(t *testing.T) {
 			if err != nil {
 				log.WithError(err).Error("event.DataAs")
 			}
-			counter++
+			atomic.AddInt32(&counter, 1)
 			//log.WithField("count", count.N).Info("receiver")
 		}
 	}
@@ -95,5 +97,6 @@ func TestNewCloudEventNats(t *testing.T) {
 	cancel()
 	<-ctx.Done()
 	time.Sleep(time.Second * 2)
-	assert.Equal(ITERATIONS, counter)
+
+	assert.Equal(int32(ITERATIONS), atomic.LoadInt32(&counter))
 }
