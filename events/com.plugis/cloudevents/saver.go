@@ -47,7 +47,7 @@ func (svc *CloudEventSaver) eventHandler(topic string, receivedEvent *event.Even
 	}
 
 	err := svc.postgresDb.InsertEvent(topic, receivedEvent, payload, CEDecodeErr)
-	logger.WithError(err).Debug("received event")
+	logger.WithError(err).Trace("received event")
 	if err != nil {
 		logger.Error("log cloudevent to postgres cloudevents table")
 	}

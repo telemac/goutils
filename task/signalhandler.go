@@ -8,6 +8,9 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/sirupsen/logrus"
+	"github.com/telemac/goutils/logger"
 )
 
 // SignalHandler allows to cancel a cancellable context on os interrupt signal reception
@@ -70,5 +73,16 @@ func NewCancellableContext(timeout time.Duration) (ctx context.Context, cancel c
 		panic(err) // never happens, normally
 	}
 
-	return ctx,cancel
+	return ctx, cancel
+}
+
+// NewCancellableContextWithLog returns a cancellable context that handles interrupt signal.
+// maxCancelTimeout is the timeout after which the process is exited if not already terminated
+// logLevel : logrus log levels
+func NewCancellableContextWithLog(maxCancelTimeout time.Duration, logLevel string, fields logrus.Fields) (ctx context.Context, cancel context.CancelFunc, log *logrus.Entry) {
+	// create a cancellable context
+	ctx, cancel = NewCancellableContext(maxCancelTimeout)
+	// create logger
+	log = logger.New(logLevel, fields)
+	return
 }
