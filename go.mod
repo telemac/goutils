@@ -5,7 +5,6 @@ go 1.16
 require (
 	github.com/Allenxuxu/gev v0.3.0
 	github.com/Allenxuxu/ringbuffer v0.0.11 // indirect
-	github.com/andybalholm/brotli v1.0.2 // indirect
 	github.com/apenella/go-ansible v1.1.0
 	github.com/apenella/go-common-utils v0.2.0 // indirect
 	github.com/apenella/go-common-utils/error v0.0.0-20210101160429-a7ae7d856d3e // indirect
@@ -23,7 +22,6 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
 	github.com/kardianos/service v1.2.0
-	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/lib/pq v1.10.0 // indirect
 	github.com/libp2p/go-reuseport v0.1.0
@@ -34,13 +32,9 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
 	github.com/tevino/abool v1.2.0
-	github.com/valyala/fasthttp v1.24.0
-	github.com/valyala/tcplisten v1.0.0 // indirect
-	golang.org/x/crypto v0.0.0-20220214200702-86341886e292 // indirect
+	github.com/valyala/fasthttp v1.34.0
 	golang.org/x/lint v0.0.0-20201208152925-83fdc39ff7b5 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
-	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
-	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20211116232009-f0f3c7e86c11 // indirect
 	golang.org/x/tools v0.0.0-20201211185031-d93e913c1a58 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
