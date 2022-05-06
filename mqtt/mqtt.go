@@ -8,7 +8,7 @@ import (
 
 	"github.com/eclipse/paho.golang/autopaho"
 	"github.com/eclipse/paho.golang/paho"
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 	"github.com/telemac/goutils/logger"
 )
@@ -82,9 +82,9 @@ func (mqttClient *MqttClient) Connect(ctx context.Context) error {
 		return err
 	}
 
-	uid, err := uuid.NewV4()
+	uid, err := uuid.NewUUID()
 	if err != nil {
-		mqttClient.log.Error("generate uuid v4")
+		mqttClient.log.Error("generate uuid")
 	}
 
 	// build autopaho configuration

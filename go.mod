@@ -11,10 +11,12 @@ require (
 	github.com/apenella/go-common-utils/error v0.0.0-20210101160429-a7ae7d856d3e // indirect
 	github.com/cloudevents/sdk-go/protocol/nats/v2 v2.8.0
 	github.com/cloudevents/sdk-go/v2 v2.8.0
+	github.com/eclipse/paho.golang v0.10.0
 	github.com/gofiber/fiber/v2 v2.8.0
 	github.com/gofiber/template v1.6.8
 	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/google/uuid v1.2.0
+	github.com/google/uuid v1.3.0
+	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/jackc/pgproto3/v2 v2.0.7 // indirect
 	github.com/jimlawless/whereami v0.0.0-20160417220522-aebf70d4a772
 	github.com/jinzhu/configor v1.2.1
@@ -36,7 +38,7 @@ require (
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292 // indirect
 	golang.org/x/lint v0.0.0-20201208152925-83fdc39ff7b5 // indirect
-	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
+	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20211116232009-f0f3c7e86c11 // indirect
