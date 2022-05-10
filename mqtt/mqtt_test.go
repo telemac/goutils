@@ -20,16 +20,16 @@ func TestConnect(t *testing.T) {
 	mqttClient := NewMqttClient(MqttParams{
 		ServerURL: "tcp://colorbeam:1883",
 		ClientID:  "mqtttest",
-		//InitialSubscriptions: &paho.Subscribe{
-		//	Subscriptions: map[string]paho.SubscribeOptions{
-		//		"colorbeam/load/store":        {QoS: 1},
-		//		"colorbeam/load/+/status":     {QoS: 1},
-		//		"colorbeam/load/+/transition": {QoS: 1},
-		//		"colorbeam/+/+/heartbeat":     {QoS: 1},
-		//		"colorbeam/building":          {QoS: 1},
-		//		"#":                           {QoS: 1},
-		//	},
-		//},
+		InitialSubscriptions: &paho.Subscribe{
+			Subscriptions: map[string]paho.SubscribeOptions{
+				"colorbeam/loads":                 {QoS: 1},
+				"colorbeam/building":              {QoS: 1},
+				"colorbeam/drivers":               {QoS: 1},
+				"colorbeam/calibrations":          {QoS: 1},
+				"colorbeam/persist":               {QoS: 1},
+				"colorbeam/dmx_serial/+/universe": {QoS: 1},
+			},
+		},
 	})
 	err := mqttClient.Connect(ctx)
 	assert.NoError(err)
@@ -37,7 +37,7 @@ func TestConnect(t *testing.T) {
 
 	err = mqttClient.Subscribe(ctx, &paho.Subscribe{
 		Subscriptions: map[string]paho.SubscribeOptions{
-			"colorbeam/load/store": {QoS: 1},
+			"colorbeam/load/+/status": {QoS: 1},
 		},
 	})
 
@@ -60,10 +60,10 @@ func TestConnect(t *testing.T) {
 	}
 
 	// wait
-	mqttClient.Done()
+	<-mqttClient.Done()
 	logrus.Info("mqttClient.Done")
 
-	ctx, _ = context.WithTimeout(context.TODO(), time.Second*3)
+	ctx, _ = context.WithTimeout(context.TODO(), time.Second*2)
 	mqttClient.Disconnect(ctx)
 	mqttClient.Close()
 
