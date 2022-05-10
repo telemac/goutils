@@ -23,6 +23,7 @@ func TestBackupTopics(t *testing.T) {
 
 	topicsBackup, err := BackupTopics(ctx, "tcp://colorbeam:1883", topics)
 	assert.NoError(err)
-	_ = topicsBackup
 
+	err = RestoreTopics(context.TODO(), "tcp://colorbeam:1883", topicsBackup)
+	assert.NoError(err)
 }
