@@ -11,7 +11,7 @@ import (
 // TopicsBackup holds the mqtt topics values
 type TopicsBackup map[string]string
 
-// BackupTopics connects to an mqtt server and writes the topics and their content into the writer
+// BackupTopics connects to a mqtt server and writes the topics and their content into the writer
 func BackupTopics(ctx context.Context, server string, topics []string) (TopicsBackup, error) {
 
 	topicsBackup := make(TopicsBackup)
