@@ -36,7 +36,8 @@ func (s Server) Run(ctx context.Context, params ...interface{}) error {
 
 	// create standard logger if not defined
 	if s.config.Logger == nil {
-		s.config.Logger = logrus.New().WithField("logrus", "standard")
+		s.config.Logger = logrus.New().WithField("logrus", "default logger")
+		s.config.Logger.Warn("no logger defined for tcp server")
 	}
 
 	// add listen field to the logger
@@ -45,19 +46,7 @@ func (s Server) Run(ctx context.Context, params ...interface{}) error {
 	})
 
 	var tcpServer TCPServer
-	err := tcpServer.ListerAndServe(ctx, listenStr, func(ctx context.Context, conn net.Conn, userData interface{}) {
-		// one goroutine per connection
-		connectionParams := ConnectionParams{
-			Conn:         conn,
-			ServerConfig: &s.config,
-		}
-		acceptConnection := connectionParams.ServerConfig.Connection.OnConnect(ctx, connectionParams)
-		if acceptConnection {
-			connectionParams.ServerConfig.Connection.HandleConnection(ctx, connectionParams)
-		}
-		connectionParams.ServerConfig.Connection.OnDisconnect(ctx, connectionParams)
-
-	}, s.config.TlsConfig, s.config.UserData)
+	err := tcpServer.ListerAndServe(ctx, listenStr, s.connectionHandler, s.config.TlsConfig, s.config.UserData)
 	if err != nil {
 		if errors.Is(err, ErrCancelled) {
 			s.config.Logger.WithError(err).Warn("listen to incoming connections cancelled")
@@ -68,5 +57,19 @@ func (s Server) Run(ctx context.Context, params ...interface{}) error {
 	tcpServer.Wait()
 
 	return nil
+
+}
+
+func (s Server) connectionHandler(ctx context.Context, conn net.Conn, userData interface{}) {
+	// one goroutine per connection
+	connectionParams := ConnectionParams{
+		Conn:         conn,
+		ServerConfig: &s.config,
+	}
+	acceptConnection := connectionParams.ServerConfig.Connection.OnConnect(ctx, connectionParams)
+	if acceptConnection {
+		connectionParams.ServerConfig.Connection.HandleConnection(ctx, connectionParams)
+	}
+	connectionParams.ServerConfig.Connection.OnDisconnect(ctx, connectionParams)
 
 }
