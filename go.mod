@@ -5,7 +5,6 @@ go 1.16
 require (
 	github.com/Allenxuxu/gev v0.3.0
 	github.com/Allenxuxu/ringbuffer v0.0.11 // indirect
-	github.com/andybalholm/brotli v1.0.2 // indirect
 	github.com/apenella/go-ansible v1.1.0
 	github.com/apenella/go-common-utils v0.2.0 // indirect
 	github.com/apenella/go-common-utils/error v0.0.0-20210101160429-a7ae7d856d3e // indirect
@@ -22,29 +21,26 @@ require (
 	github.com/jinzhu/configor v1.2.1
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
-	github.com/kardianos/service v1.2.0
-	github.com/klauspost/compress v1.13.6 // indirect
+	github.com/kardianos/service v1.2.1
+	github.com/klauspost/compress v1.15.5 // indirect
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/lib/pq v1.10.0 // indirect
 	github.com/libp2p/go-reuseport v0.1.0
-	github.com/minio/highwayhash v1.0.2 // indirect
-	github.com/nats-io/jwt/v2 v2.2.0 // indirect
-	github.com/nats-io/nats.go v1.13.0
+	github.com/nats-io/nats-server/v2 v2.8.4 // indirect
+	github.com/nats-io/nats.go v1.15.0
 	github.com/rogpeppe/go-internal v1.8.0 // indirect
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
 	github.com/tevino/abool v1.2.0
-	github.com/valyala/fasthttp v1.24.0
-	github.com/valyala/tcplisten v1.0.0 // indirect
-	golang.org/x/crypto v0.0.0-20220214200702-86341886e292 // indirect
+	github.com/valyala/fasthttp v1.37.0
+	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
 	golang.org/x/lint v0.0.0-20201208152925-83fdc39ff7b5 // indirect
-	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2
+	golang.org/x/net v0.0.0-20220225172249-27dd8689420f
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
-	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
-	golang.org/x/text v0.3.7 // indirect
-	golang.org/x/time v0.0.0-20211116232009-f0f3c7e86c11 // indirect
+	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
+	golang.org/x/time v0.0.0-20220411224347-583f2d630306 // indirect
 	golang.org/x/tools v0.0.0-20201211185031-d93e913c1a58 // indirect
-	google.golang.org/protobuf v1.27.1 // indirect
+	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
