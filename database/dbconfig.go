@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/jinzhu/configor"
 	"gorm.io/driver/mysql"
@@ -31,6 +32,17 @@ func (dc *DBConfig) MySqlDSN() string {
 // MySQLConnect connects to a MySQL database
 func MySQLConnect(config *DBConfig) (*gorm.DB, error) {
 	db, err := gorm.Open(mysql.Open(config.MySqlDSN()), &gorm.Config{})
+
+	// avoid closing bad idle connection errors
+	// TODO : check if needed with gorm 2
+	d, err := db.DB()
+	if err != nil {
+		return nil, err
+	}
+	d.SetMaxOpenConns(100)
+	d.SetMaxIdleConns(100)
+	d.SetConnMaxLifetime(180 * time.Second)
+
 	return db, err
 }
 
