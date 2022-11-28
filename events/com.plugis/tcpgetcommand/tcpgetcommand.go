@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/Allenxuxu/gev"
-	"github.com/Allenxuxu/gev/connection"
 	"github.com/sirupsen/logrus"
 	"github.com/telemac/goutils/natsevents"
 	"github.com/telemac/goutils/natsservice"
@@ -31,7 +30,7 @@ func NewTcpGetCommandService(config TcpGetCommandConfig) *TcpGetCommandService {
 	return &TcpGetCommandService{config: config}
 }
 
-func (svc *TcpGetCommandService) OnConnect(c *connection.Connection) {
+func (svc *TcpGetCommandService) OnConnect(c *gev.Connection) {
 	svc.Logger().WithFields(logrus.Fields{
 		"peer_addr":          c.PeerAddr(),
 		"read_buffer_length": c.ReadBufferLength(),
@@ -39,7 +38,7 @@ func (svc *TcpGetCommandService) OnConnect(c *connection.Connection) {
 	//c.Set("name", "Alexandre")
 }
 
-func (svc *TcpGetCommandService) OnMessage(c *connection.Connection, ctx interface{}, data []byte) (out interface{}) {
+func (svc *TcpGetCommandService) OnMessage(c *gev.Connection, ctx interface{}, data []byte) (out interface{}) {
 	// TODO : decode watchcomx message 000042<MESSAGE_TYPE>=WATCHDOG<MODULE>=WATCH_DC09
 	svc.Logger().WithFields(logrus.Fields{
 		"data":               string(data),
@@ -71,7 +70,7 @@ func (svc *TcpGetCommandService) OnMessage(c *connection.Connection, ctx interfa
 	return
 }
 
-func (svc *TcpGetCommandService) OnClose(c *connection.Connection) {
+func (svc *TcpGetCommandService) OnClose(c *gev.Connection) {
 	c.UserBuffer()
 	svc.Logger().WithFields(logrus.Fields{
 		"peer_addr": c.PeerAddr(),

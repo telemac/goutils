@@ -26,7 +26,7 @@ func TestNewServiceProcess(t *testing.T) {
 	assert := assert.New(t)
 	serviceProcess, err := NewServiceProcess(NatsServiceProcessConfig{
 		ServiceName:   "sms-receiver",
-		NatsServers:   "nats://megalarm.local:4222",
+		NatsServers:   "nats://demo.nats.io:4222",
 		LogLevel:      "trace",
 		CancelTimeout: time.Second * 15,
 	})

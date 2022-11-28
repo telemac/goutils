@@ -1,4 +1,4 @@
-.PHONY: lint test list all
+.PHONY: lint test list vulncheck all
 
 # lint the source tree
 lint:
@@ -6,10 +6,15 @@ lint:
 
 # test runs tests
 test:
+	go clean -testcache
 	CGOENAGLE=0 GODEBUG=netdns=go go test -race ./...
 
 # list available updates in packages
 list:
 	go list -u -m all
+
+# vulnerability check
+vulncheck:
+	govulncheck ./...
 
 all: test list lint
