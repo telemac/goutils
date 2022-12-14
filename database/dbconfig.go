@@ -42,6 +42,7 @@ func MySQLConnect(config *DBConfig) (*gorm.DB, error) {
 	d.SetMaxOpenConns(100)
 	d.SetMaxIdleConns(100)
 	d.SetConnMaxLifetime(180 * time.Second)
+	err = d.Ping()
 
 	return db, err
 }
