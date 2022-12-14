@@ -59,3 +59,7 @@ func (serviceprocess *NatsServiceProcess) Start(natsSvc NatsServiceIntf, params 
 func (serviceprocess *NatsServiceProcess) WaitUntilAllDone() {
 	serviceprocess.natsServiceRepository.WaitUntilAllDone()
 }
+
+func (serviceprocess *NatsServiceProcess) Logger() *log.Entry {
+	return serviceprocess.natsServiceRepository.Logger()
+}
