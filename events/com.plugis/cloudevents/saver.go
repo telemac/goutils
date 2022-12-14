@@ -49,7 +49,7 @@ func (svc *CloudEventSaver) eventHandler(topic string, receivedEvent *event.Even
 	err := svc.postgresDb.InsertEvent(topic, receivedEvent, payload, CEDecodeErr)
 	logger.WithError(err).Trace("received event")
 	if err != nil {
-		logger.Error("log cloudevent to postgres cloudevents table")
+		logger.WithError(err).Error("log cloudevent to postgres cloudevents table")
 	}
 
 	// if event is variable set, save value to mysql variable table
@@ -58,12 +58,12 @@ func (svc *CloudEventSaver) eventHandler(topic string, receivedEvent *event.Even
 		var variables variable.Variables
 		err = receivedEvent.DataAs(&variables)
 		if err != nil {
-			logger.Info("decode variable set data")
+			logger.WithError(err).Warn("decode variable set data")
 			return nil, nil
 		}
 		err = svc.mysqlDb.upsertVariables(receivedEvent.ID(), variables)
 		if err != nil {
-			logger.Info("upsert variables")
+			logger.WithError(err).Warn("upsert variables")
 			return nil, nil
 		}
 	}
