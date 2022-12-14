@@ -13,12 +13,16 @@ import (
 // and saves events in a database
 type HeartbeatSaver struct {
 	natsservice.NatsService
-	mysqlConfig natsservice.MysqlConfig
-	db          Database
+	Config HeartbeatSaverConfig
+	db     Database
 }
 
-func NewHeartbeatSaver(mysqlConfig natsservice.MysqlConfig) *HeartbeatSaver {
-	return &HeartbeatSaver{mysqlConfig: mysqlConfig}
+type HeartbeatSaverConfig struct {
+	MysqlConfig natsservice.MysqlConfig
+}
+
+func NewHeartbeatSaver(config HeartbeatSaverConfig) *HeartbeatSaver {
+	return &HeartbeatSaver{Config: config}
 }
 
 func (svc *HeartbeatSaver) Logger() *logrus.Entry {
@@ -77,7 +81,7 @@ func (svc *HeartbeatSaver) Run(ctx context.Context, params ...interface{}) error
 	log.Debug("heartbeat-saver service started")
 	defer log.Debug("heartbeat-saver service ended")
 
-	err := svc.db.Open(svc.mysqlConfig)
+	err := svc.db.Open(svc.Config.MysqlConfig)
 	if err != nil {
 		log.WithError(err).Error("connect to database")
 	}

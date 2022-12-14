@@ -32,7 +32,9 @@ func main() {
 	servicesRepository.Start(ctx, heartbeat.NewHeartbeatWebInterface(config.Mysql))
 
 	// start heartbeat saver
-	servicesRepository.Start(ctx, heartbeat.NewHeartbeatSaver(config.Mysql))
+	servicesRepository.Start(ctx, heartbeat.NewHeartbeatSaver(heartbeat.HeartbeatSaverConfig{
+		MysqlConfig: config.Mysql},
+	))
 
 	servicesRepository.WaitUntilAllDone()
 

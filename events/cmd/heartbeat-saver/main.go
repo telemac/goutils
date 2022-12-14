@@ -26,7 +26,9 @@ func main() {
 	servicesRepository.Logger().Info("heartbeat-saver service starting")
 
 	// start heartbeat saver
-	servicesRepository.Start(ctx, heartbeat.NewHeartbeatSaver(config.Mysql))
+	servicesRepository.Start(ctx, heartbeat.NewHeartbeatSaver(heartbeat.HeartbeatSaverConfig{
+		MysqlConfig: config.Mysql},
+	))
 
 	// start heartbeat web interface
 	//servicesRepository.Start(ctx, heartbeat.NewHeartbeatWebInterface(config.Mysql))
