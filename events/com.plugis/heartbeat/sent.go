@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/telemac/goutils/net"
 	"os"
+	"runtime"
 	"time"
 )
 
@@ -15,6 +16,8 @@ type Sent struct {
 	Started         time.Time `json:"started,omitempty"`
 	Uptime          uint64    `json:"uptime,omitempty"`
 	NatsServiceName string    `json:"nats-service,omitempty"`
+	Os              string    `json:"os,omitempty"`
+	Arch            string    `json:"arch,omitempty"`
 }
 
 // NewSent creates a new sent event
@@ -41,5 +44,7 @@ func NewSent(natsServiceName string) (*Sent, error) {
 		InternalIP:      internalIP,
 		Started:         time.Now(),
 		NatsServiceName: natsServiceName,
+		Os:              runtime.GOOS,
+		Arch:            runtime.GOARCH,
 	}, nil
 }
