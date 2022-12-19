@@ -3,7 +3,10 @@ package heartbeat
 import (
 	"bufio"
 	"context"
-	"fmt"
+	"encoding/json"
+	"errors"
+	"github.com/telemac/goutils/stacktrace"
+	"sync"
 	"time"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
@@ -19,12 +22,31 @@ import (
 // that are saved in the database
 type HeartbeatWebInterface struct {
 	natsservice.NatsService
-	db          Database
-	mysqlConfig natsservice.MysqlConfig
+	db               Database
+	mysqlConfig      natsservice.MysqlConfig
+	sseChannels      map[*fiber.Ctx]chan Sent
+	sseChannelsMutex sync.RWMutex
 }
 
 func NewHeartbeatWebInterface(mysqlConfig natsservice.MysqlConfig) *HeartbeatWebInterface {
-	return &HeartbeatWebInterface{mysqlConfig: mysqlConfig}
+	return &HeartbeatWebInterface{mysqlConfig: mysqlConfig,
+		sseChannels: make(map[*fiber.Ctx]chan Sent),
+	}
+}
+
+// OnHeartbeatSent is called each time a heartbeat event is received, must return as fast as possible
+func (svc *HeartbeatWebInterface) OnHeartbeatSent(heartbeatSent Sent) {
+	log := svc.Logger()
+	svc.sseChannelsMutex.RLock()
+	defer svc.sseChannelsMutex.RUnlock()
+	for _, sentChannel := range svc.sseChannels {
+		select {
+		case sentChannel <- heartbeatSent:
+			log.WithField("heartbeat", heartbeatSent).Trace("enquele heartbeat")
+		default:
+			log.WithField("stack", stacktrace.GetStackTrace()).Warn("SSE channel is full")
+		}
+	}
 }
 
 func (svc *HeartbeatWebInterface) Run(ctx context.Context, params ...interface{}) error {
@@ -49,6 +71,9 @@ func (svc *HeartbeatWebInterface) Run(ctx context.Context, params ...interface{}
 
 	server.App.Get("/sse/events", func(c *fiber.Ctx) error {
 		ctx := c.Context()
+
+		log := svc.Logger().WithField("endpoint", "/sse/events")
+
 		ctx.SetContentType("text/event-stream")
 		ctx.Response.Header.Set("Cache-Control", "no-cache")
 		ctx.Response.Header.Set("Connection", "keep-alive")
@@ -58,25 +83,42 @@ func (svc *HeartbeatWebInterface) Run(ctx context.Context, params ...interface{}
 		ctx.Response.Header.Set("Access-Control-Allow-Credentials", "true")
 
 		ctx.SetBodyStreamWriter(fasthttp.StreamWriter(func(w *bufio.Writer) {
-			log.WithField("ip", ctx.RemoteAddr()).Info("server sent event connected")
-			defer log.WithField("ip", ctx.RemoteAddr().String()).Info("server sent event disconnected")
+			remoteAddr := ctx.RemoteAddr().String()
+			log.WithField("ip", remoteAddr).Info("server sent event connected")
+			// register a channel to receive HeartbeatSent events
+			svc.sseChannelsMutex.Lock()
+			svc.sseChannels[c] = make(chan Sent, 10)
+			svc.sseChannelsMutex.Unlock()
+			defer func() {
+				svc.sseChannelsMutex.Lock()
+				delete(svc.sseChannels, c)
+				svc.sseChannelsMutex.Unlock()
+				log.WithField("ip", remoteAddr).Info("server sent event disconnected")
+			}()
 
-			var i int
 			for {
-				i++
-				msg := fmt.Sprintf("%d - the time is %v", i, time.Now())
-				_, err := fmt.Fprintf(w, "event: message\ndata: Message: %s\n\n", msg)
-				if err != nil {
-					log.WithError(err).Warn("Fprintf in /sse/events")
+				select {
+				case <-ctx.Done(): // disconnect
 					return
+				case event := <-svc.sseChannels[c]:
+					sseData, err := json.Marshal(event)
+					if err != nil {
+						log.WithError(err).Warn("decode heartbeat sent event")
+						return
+					}
+
+					//_, err = fmt.Fprintf(w, "event: %s\ndata: %s\n\n", "message", sseData)
+					_, err = w.WriteString("data: " + string(sseData) + "\n\n")
+					if err != nil {
+						log.WithError(err).Warn("Write event")
+						return
+					}
+					err = w.Flush()
+					if err != nil {
+						log.WithError(err).Warn("Flush")
+						return
+					}
 				}
-				fmt.Println(msg)
-				err = w.Flush()
-				if err != nil {
-					log.WithError(err).Warn("Flush in /sse/events")
-					return
-				}
-				time.Sleep(1 * time.Second)
 			}
 		}))
 
@@ -96,6 +138,11 @@ func (svc *HeartbeatWebInterface) Run(ctx context.Context, params ...interface{}
 	        }"
 	*/
 	server.App.Post("/cloudevents/send", func(c *fiber.Ctx) error {
+		ctx := c.Context()
+
+		ctx.Response.Header.Set("Access-Control-Allow-Origin", "*")
+		ctx.Response.Header.Set("Access-Control-Allow-Headers", "Cache-Control")
+		ctx.Response.Header.Set("Access-Control-Allow-Credentials", "true")
 
 		sendResult := func(obj interface{}, err error) {
 			type Result struct {
@@ -115,8 +162,25 @@ func (svc *HeartbeatWebInterface) Run(ctx context.Context, params ...interface{}
 		}
 
 		var ce cloudevents.Event
-		// TODO : use own structure for event to allow missing specversion
+
+		// use own structure for event to allow missing specversion
+		//body := c.Body()
+		/*
+			type SendCloudEvent struct {
+				Topic           string      `json:"topic"`
+				Type            string      `json:"type"`
+				Request         bool        `json:"request"`
+				Timeout         int         `json:"timeout"`
+				Source          string      `json:"source"`
+				Specversion     string      `json:"specversion,omitempty"`
+				Datacontenttype string      `json:"datacontenttype"`
+				Data            interface{} `json:"data"`
+			}
+			var sendCloudEvent SendCloudEvent
+		*/
+		c.Request().Header.Set("Content-Type", "application/json")
 		err := c.BodyParser(&ce)
+
 		if err != nil {
 			log.WithError(err).Warn("parse cloudEvent from body")
 			sendResult(nil, err)
@@ -164,10 +228,10 @@ func (svc *HeartbeatWebInterface) Run(ctx context.Context, params ...interface{}
 
 		duration := time.Second * time.Duration(timeout)
 		// call cancel function when done
-		ctx, cancel := context.WithTimeout(context.TODO(), duration)
+		ctxTimeout, cancel := context.WithTimeout(context.TODO(), duration)
 		defer cancel()
 		if request {
-			returnedEvent, err := svc.Transport().Request(ctx, &ce, topic, duration)
+			returnedEvent, err := svc.Transport().Request(ctxTimeout, &ce, topic, duration)
 			if err != nil {
 				log.WithError(err).Warn("cloudEvent request")
 				sendResult(nil, err)
@@ -189,6 +253,15 @@ func (svc *HeartbeatWebInterface) Run(ctx context.Context, params ...interface{}
 		log.Tracef("timeout = %d\n", timeout)
 
 		return nil
+	})
+
+	server.App.Get("/heartbeats/comments", func(c *fiber.Ctx) error {
+		ctx := c.Context()
+		ctx.Response.Header.Set("Access-Control-Allow-Origin", "*")
+		ctx.Response.Header.Set("Access-Control-Allow-Headers", "Cache-Control")
+		ctx.Response.Header.Set("Access-Control-Allow-Credentials", "true")
+		// TODO : return mac with non empty comments
+		return errors.New("/heartbeats/comments not implemented ")
 	})
 
 	err = server.Run(ctx)
