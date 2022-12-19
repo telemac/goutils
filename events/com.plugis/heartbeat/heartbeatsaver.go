@@ -17,8 +17,12 @@ type HeartbeatSaver struct {
 	db     Database
 }
 
+// OnHeartbeatSentCb is called each time a heartbit send event is received
+type OnHeartbeatSentCb func(sent Sent)
+
 type HeartbeatSaverConfig struct {
-	MysqlConfig natsservice.MysqlConfig
+	MysqlConfig     natsservice.MysqlConfig
+	OnHeartbeatSent OnHeartbeatSentCb
 }
 
 func NewHeartbeatSaver(config HeartbeatSaverConfig) *HeartbeatSaver {
@@ -55,12 +59,16 @@ func (svc *HeartbeatSaver) eventHandler(topic string, receivedEvent *event.Event
 			"hostname": heartbeatSent.Hostname,
 			"ip":       heartbeatSent.InternalIP,
 			"uptime":   heartbeatSent.Uptime,
-		}).Info("received heartbeat")
+		}).Debug("received heartbeat")
 
-		// TODO : save heartbeat to database
+		// save heartbeat to database
 		err = svc.db.upsertHeartbeat(heartbeatSent)
 		if err != nil {
 			svc.Logger().WithError(err).Error("save heartbeat to database")
+		}
+		// call the OnHeartbeatSent callback if specified
+		if svc.Config.OnHeartbeatSent != nil {
+			svc.Config.OnHeartbeatSent(heartbeatSent)
 		}
 
 		return nil, err
