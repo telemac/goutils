@@ -13,13 +13,16 @@ import (
 	"github.com/telemac/goutils/task"
 	"github.com/telemac/goutils/updater"
 	"os"
+	"strings"
 	"time"
 )
 
 type CommandLineParams struct {
-	Install bool
-	Update  bool
-	Log     string
+	Install     bool
+	Uninstall   bool
+	Update      bool
+	Log         string
+	NatsServers string
 }
 
 var commandLineParams CommandLineParams
@@ -30,8 +33,11 @@ func main() {
 
 	// get command line params
 	flag.BoolVar(&commandLineParams.Install, "install", false, "install as service")
+	flag.BoolVar(&commandLineParams.Uninstall, "uninstall", false, "uninstall the service")
 	flag.BoolVar(&commandLineParams.Update, "update", true, "self update at startup")
 	flag.StringVar(&commandLineParams.Log, "log", "warn", "log level (trace|debug|info|warn|error)")
+	flag.StringVar(&commandLineParams.NatsServers, "nats", "", "nats server urls separated by ,")
+
 	flag.Parse()
 
 	logrus.SetLevel(logrus.TraceLevel)
@@ -41,9 +47,27 @@ func main() {
 		ServiceName: "remote-access",
 	}
 	if commandLineParams.Install {
-		err := selfInstallService.Install()
+		var arguments []string
+		if commandLineParams.NatsServers != "" {
+			arguments = append(arguments, "-nats", commandLineParams.NatsServers)
+		}
+
+		err := selfInstallService.Install(arguments)
 		if err != nil {
-			logrus.WithError(err).Error("installint service")
+			logrus.WithError(err).Error("installing service")
+		} else {
+			logrus.Info("service installed")
+		}
+		return
+	}
+
+	if commandLineParams.Uninstall {
+
+		err := selfInstallService.Uninstall()
+		if err != nil {
+			logrus.WithError(err).Error("uninstalling service")
+		} else {
+			logrus.Info("service uninstalled")
 		}
 		return
 	}
@@ -77,7 +101,15 @@ func main() {
 	}
 
 	//servicesRepository, err := natsservice.NewNatsServiceRepository("remote-access", "nats://cloud1.idronebox.com:443", "trace")
-	servicesRepository, err := natsservice.NewNatsServiceRepository("remote-access", "nats://server1.plugis.com:443", commandLineParams.Log)
+
+	var servers []string
+	if commandLineParams.NatsServers != "" {
+		servers = strings.Split(commandLineParams.NatsServers, ",")
+	}
+
+	servers = append(servers, "wss://nats.plugis.cloud:443")
+	serversList := strings.Join(servers, ",")
+	servicesRepository, err := natsservice.NewNatsServiceRepository("remote-access", serversList, commandLineParams.Log)
 	if err != nil {
 		logrus.WithError(err).Fatal("create nats service repository")
 	}
