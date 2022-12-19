@@ -31,11 +31,20 @@ func NewNatsServiceRepository(name string, natsServers string, logLevel string) 
 	})
 
 	// Create nats transport for cloud events
-	var err error
-	nsr.transport, err = natsevents.NewNatsTransport(natsServers)
+	transport, err := natsevents.NewNatsTransport(natsServers)
 	if err != nil {
+		nsr.logger.WithFields(logrus.Fields{
+			"error":            err.Error(),
+			"servers":          natsServers,
+			"connected_server": transport.ConnectedServer(),
+		}).Warn("connect to nats server")
 		return &NatsServiceRepository{}, fmt.Errorf("create nate transport : %w", err)
 	}
+	nsr.transport = transport
+	nsr.logger.WithFields(logrus.Fields{
+		"servers":          natsServers,
+		"connected_server": transport.ConnectedServer(),
+	}).Debug("connected to nats server")
 
 	return nsr, nil
 }

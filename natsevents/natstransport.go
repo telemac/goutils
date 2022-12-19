@@ -25,10 +25,11 @@ import (
 type NatsTransport struct {
 	CloudEventSender
 	CloudEventReceiver
-	servers       string
-	nc            *nats.Conn
-	mutex         sync.RWMutex
-	subscriptions map[string]*natsSubscription // subscriptions done by RegisterHandler, indexed by subscription.Subject
+	servers         string // list of nats server separated with ,
+	connectedServer string // url of the connected server
+	nc              *nats.Conn
+	mutex           sync.RWMutex
+	subscriptions   map[string]*natsSubscription // subscriptions done by RegisterHandler, indexed by subscription.Subject
 }
 
 // natsSubscription holds the nats.Subscription and callback
@@ -106,41 +107,55 @@ func (d *SNIDialer) Dial(network, address string) (net.Conn, error) {
 }
 
 // NewNatsTransport connects to nats and creates a NatsTransport
-func NewNatsTransport(server string) (*NatsTransport, error) {
+func NewNatsTransport(serverList string) (*NatsTransport, error) {
 	var err error
 	transport := &NatsTransport{
-		servers:       server,
+		servers:       serverList,
 		subscriptions: make(map[string]*natsSubscription),
 	}
 
-	opts := []nats.Option{
-		nats.ReconnectHandler(transport.reconnectedCB),
-		nats.DisconnectErrHandler(transport.disconnectedErrCB),
-		nats.ClosedHandler(transport.closedHandler),
-		nats.DiscoveredServersHandler(transport.discoveredServersCB),
-		nats.ErrorHandler(transport.errorHandler),
-		nats.MaxReconnects(-1),
-		nats.DrainTimeout(30 * time.Second),
+	// split multiple connections strings
+	servers := strings.Split(serverList, ",")
+	for _, server := range servers {
 
-		//nats.Name("cloud1.idronebox.com"),
+		opts := []nats.Option{
+			nats.ReconnectHandler(transport.reconnectedCB),
+			nats.DisconnectErrHandler(transport.disconnectedErrCB),
+			nats.ClosedHandler(transport.closedHandler),
+			nats.DiscoveredServersHandler(transport.discoveredServersCB),
+			nats.ErrorHandler(transport.errorHandler),
+			nats.MaxReconnects(-1),
+			nats.DrainTimeout(30 * time.Second),
+			//nats.Name("cloud1.idronebox.com"),
+		}
+
+		// get host name
+		var u *url.URL
+		u, err = url.Parse(server)
+		if err != nil {
+			return nil, err
+		}
+		hostname := u.Hostname()
+
+		// use SNI whet protocol is nats:// on port 443
+		if strings.Contains(server, "nats://") && strings.Contains(server, ":443") {
+			opts = append(opts, nats.SetCustomDialer(&SNIDialer{ServerName: hostname}), SNI(hostname))
+		}
+
+		transport.nc, err = nats.Connect(server, opts...)
+		if err == nil {
+			transport.connectedServer = server
+			return transport, err
+		}
 
 	}
-
-	// get host name
-	u, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-	hostname := u.Hostname()
-
-	// TODO : find a solution for SNI with multiple servers, may be it must be implemented in nats
-	if strings.Contains(server, "nats://") && strings.Contains(server, ":443") {
-		opts = append(opts, nats.SetCustomDialer(&SNIDialer{ServerName: hostname}), SNI(hostname))
-	}
-
-	transport.nc, err = nats.Connect(server, opts...)
 
 	return transport, err
+}
+
+// ConnectedServer returns the name of the connected server in the server list
+func (t *NatsTransport) ConnectedServer() string {
+	return t.connectedServer
 }
 
 func (t *NatsTransport) reconnectedCB(conn *nats.Conn) {

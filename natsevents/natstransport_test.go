@@ -30,9 +30,9 @@ func TestNewNatsTransport(t *testing.T) {
 	transport, err = NewNatsTransport("nats://cloud1.idronebox.com:443")
 	assert.NoError(err)
 	assert.True(transport.Connected())
-	transport, err = NewNatsTransport("nats://server1.plugis.com:443")
-	assert.NoError(err)
-	assert.True(transport.Connected())
+	//transport, err = NewNatsTransport("nats://server1.plugis.com:443")
+	//assert.NoError(err)
+	//assert.True(transport.Connected())
 
 	eventHandler := func(topic string, event *event.Event, payload []byte, err error) (*event.Event, error) {
 		//logrus.Printf("eventHandler callback topic = %s event = %s", topic, event)
@@ -47,11 +47,13 @@ func TestNewNatsTransport(t *testing.T) {
 			case "com.plugis.sample.event.natsevents.Count":
 				var count Count
 				err = event.DataAs(&count)
+				assert.NoError(err)
 				if err != nil {
 					logrus.WithError(err).Fatal("decode event data")
 				}
 				if lastCount != count.N-1 {
-					logrus.Fatal("lastCount")
+					assert.Equal(count.N-1, lastCount)
+					//logrus.Fatal("lastCount")
 				}
 				lastCount = count.N
 				//logrus.Printf("count = %d", count.N)
