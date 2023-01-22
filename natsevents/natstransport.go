@@ -191,6 +191,14 @@ func (t *NatsTransport) Flush(timeout time.Duration) error {
 func (t *NatsTransport) Send(ctx context.Context, event *event.Event, topic string) error {
 	if event.Source() == "" {
 		event.SetSource(whereami.WhereAmI(2))
+		/*
+			jsonStackTrace, err := json.Marshal(stacktrace.GetStackTrace())
+			if err != nil {
+				return fmt.Errorf("json.Marshal stack trace in NatsTransport.Send : %w", err)
+			}
+			// TODO: check accepted format
+			event.SetSource(string(jsonStackTrace))
+		*/
 	}
 	payload, err := event.MarshalJSON()
 	if err != nil {
