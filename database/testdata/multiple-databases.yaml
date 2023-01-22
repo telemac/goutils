@@ -1,0 +1,15 @@
+databases:
+  - name: my-mysql-db
+    type: mysql
+    host: myMysqlHost
+    database: myMysqlDatabase
+    user:     myMysqlUser
+    password: myMysqlPassword
+    port:     3306
+  - name: my-postgres-db
+    type: postgres
+    host: myPostgresHost
+    database: myPostgresDatabase
+    user:     myPostgresUser
+    password: myPostgresPassword
+    port:     5432
