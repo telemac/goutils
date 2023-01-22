@@ -1,6 +1,7 @@
-package main
+package remote_access
 
 import (
+	"context"
 	"flag"
 	"github.com/sirupsen/logrus"
 	"github.com/telemac/goutils/events/com.plugis/ansible"
@@ -10,20 +11,15 @@ import (
 	"github.com/telemac/goutils/events/com.plugis/shell"
 	"github.com/telemac/goutils/natsservice"
 	"github.com/telemac/goutils/net"
-	"github.com/telemac/goutils/remote-access"
-	"github.com/telemac/goutils/task"
 	"github.com/telemac/goutils/updater"
 	"os"
 	"strings"
 	"time"
 )
 
-func main() {
-	ctx, cancel := task.NewCancellableContext(time.Second * 15)
-	defer cancel()
-
+func (ra *RemoteAccess) Run(ctx context.Context) error {
 	// get command line params
-	var commandLineParams remote_access.CommandLineParams
+	var commandLineParams CommandLineParams
 	flag.BoolVar(&commandLineParams.Install, "install", false, "install as service")
 	flag.BoolVar(&commandLineParams.Uninstall, "uninstall", false, "uninstall the service")
 	flag.BoolVar(&commandLineParams.Update, "update", true, "self update at startup")
@@ -50,7 +46,7 @@ func main() {
 		} else {
 			logrus.Info("service installed")
 		}
-		return
+		return err
 	}
 
 	if commandLineParams.Uninstall {
@@ -61,13 +57,13 @@ func main() {
 		} else {
 			logrus.Info("service uninstalled")
 		}
-		return
+		return err
 	}
 
 	if commandLineParams.Update {
 		// self update binary
 		logrus.Info("check for update")
-		selfUpdater, err := updater.NewSelfUpdater("https://update.plugis.com/", "")
+		selfUpdater, err := updater.NewSelfUpdater(ra.config.BaseUpdateUrl, "")
 		if err != nil {
 			logrus.WithError(err).Error("self update creation")
 		}
@@ -92,11 +88,13 @@ func main() {
 		}
 	}
 
-	//servicesRepository, err := natsservice.NewNatsServiceRepository("remote-access", "nats://cloud1.idronebox.com:443", "trace")
-
 	var servers []string
 	if commandLineParams.NatsServers != "" {
 		servers = strings.Split(commandLineParams.NatsServers, ",")
+	}
+
+	if len(ra.config.NatsServers) > 0 {
+		servers = append(servers, ra.config.NatsServers...)
 	}
 
 	servers = append(servers, "wss://remote-access:@nats.plugis.cloud:443", "ws://remote-access:@nats.plugis.cloud:8222")
@@ -132,7 +130,13 @@ func main() {
 	// com.plugis.ansible service
 	servicesRepository.Start(ctx, &ansible.AnsibleService{})
 
+	// lanuch
+	for _, natsSvc := range ra.config.NatsServices {
+		servicesRepository.Start(ctx, natsSvc)
+	}
+
 	servicesRepository.WaitUntilAllDone()
 
 	servicesRepository.Logger().Info("remote-access service ending")
+	return nil
 }

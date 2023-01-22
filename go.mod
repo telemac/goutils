@@ -15,6 +15,7 @@ require (
 	github.com/jinzhu/configor v1.2.1
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
 	github.com/kardianos/service v1.2.2
+	github.com/knadh/koanf v1.4.4
 	github.com/libp2p/go-reuseport v0.2.0
 	github.com/nats-io/nats.go v1.20.0
 	github.com/sirupsen/logrus v1.9.0
@@ -38,6 +39,7 @@ require (
 	github.com/apenella/go-common-utils/error v0.0.0-20220913191136-86daaa87e7df // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fatih/color v1.13.0 // indirect
+	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
@@ -56,6 +58,9 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
 	github.com/mattn/go-runewidth v0.0.14 // indirect
+	github.com/mitchellh/copystructure v1.2.0 // indirect
+	github.com/mitchellh/mapstructure v1.5.0 // indirect
+	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/nats-io/nats-server/v2 v2.8.4 // indirect
