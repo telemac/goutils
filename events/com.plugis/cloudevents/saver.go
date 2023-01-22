@@ -2,11 +2,9 @@ package cloudevents
 
 import (
 	"context"
-	"reflect"
-
 	"github.com/cloudevents/sdk-go/v2/event"
 	"github.com/sirupsen/logrus"
-	"github.com/telemac/goutils/variable"
+	"reflect"
 
 	"github.com/telemac/goutils/natsservice"
 )
@@ -51,23 +49,23 @@ func (svc *CloudEventSaver) eventHandler(topic string, receivedEvent *event.Even
 	if err != nil {
 		logger.WithError(err).Error("log cloudevent to postgres cloudevents table")
 	}
-
-	// if event is variable set, save value to mysql variable table
-	if receivedEvent != nil && receivedEvent.Type() == "com.plugis.variable.set" {
-		logger.Info("variable set")
-		var variables variable.Variables
-		err = receivedEvent.DataAs(&variables)
-		if err != nil {
-			logger.WithError(err).Warn("decode variable set data")
-			return nil, nil
+	/*
+		// if event is variable set, save value to mysql variable table
+		if receivedEvent != nil && receivedEvent.Type() == "com.plugis.variable.set" {
+			logger.Info("variable set")
+			var variables variable.Variables
+			err = receivedEvent.DataAs(&variables)
+			if err != nil {
+				logger.WithError(err).Warn("decode variable set data")
+				return nil, nil
+			}
+			err = svc.mysqlDb.upsertVariables(receivedEvent.ID(), variables)
+			if err != nil {
+				logger.WithError(err).Warn("upsert variables")
+				return nil, nil
+			}
 		}
-		err = svc.mysqlDb.upsertVariables(receivedEvent.ID(), variables)
-		if err != nil {
-			logger.WithError(err).Warn("upsert variables")
-			return nil, nil
-		}
-	}
-
+	*/
 	// don't send a response to any request
 	return nil, nil
 }
@@ -84,12 +82,14 @@ func (svc *CloudEventSaver) Run(ctx context.Context, params ...interface{}) erro
 		return err
 	}
 
-	// open variables database (mysql)
-	err = svc.mysqlDb.Open(svc.mysqlConfig)
-	if err != nil {
-		log.WithError(err).Error("connect to MySQL database")
-		return err
-	}
+	/*
+		// open variables database (mysql)
+		err = svc.mysqlDb.Open(svc.mysqlConfig)
+		if err != nil {
+			log.WithError(err).Error("connect to MySQL database")
+			return err
+		}
+	*/
 
 	// register eventHandler for event reception
 	err = svc.Transport().RegisterHandler(svc.eventHandler, ">")
@@ -97,6 +97,14 @@ func (svc *CloudEventSaver) Run(ctx context.Context, params ...interface{}) erro
 		log.WithError(err).Error("failed to register event handler")
 		return err
 	}
+
+	//for !task.IsCancelled(ctx) {
+	//	err = svc.postgresDb.Cleanheartbeats()
+	//	if err != nil {
+	//		log.WithError(err).Error("clean heartbeat cloudevents")
+	//	}
+	//	task.Sleep(ctx, time.Minute)
+	//}
 
 	<-ctx.Done()
 	return nil

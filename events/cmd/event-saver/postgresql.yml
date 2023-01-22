@@ -1,5 +1,6 @@
 postgres:
-  database: plugis
-  user:     plugis
-  password: plugis
+  host: nats.plugis.cloud
+  database: postgres
+  user:     postgres
+  password: telemac
   port:     5432

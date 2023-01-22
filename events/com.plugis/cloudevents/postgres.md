@@ -66,5 +66,21 @@ limit 10
 -- get last heartbeats
 select data->'mac' as mac,max(time) as last,min(time) as first from cloudevents where type='com.plugis.heartbeat.Sent' group by mac
 order by last desc
+
+-- extract heartbeats
+SELECT id, type,
+       data->>'ip' AS ip,
+       data->>'os' AS os,
+       data->>'mac' AS mac,
+       data->>'arch' AS arch,
+       data->>'uptime' AS uptime,
+       data->>'started' AS started,
+       data->>'hostname' AS hostname,
+       data->>'nats-service' AS nats_service
+FROM cloudevents
+where type='com.plugis.heartbeat.Sent'
+order by time desc;
+
 ```
+
 

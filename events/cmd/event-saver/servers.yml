@@ -1,3 +1,3 @@
 servers:
-  - url: nats://server1.plugis.com:443
-    sni: true
+  - url: wss://nats.plugis.cloud:443
+    sni: false

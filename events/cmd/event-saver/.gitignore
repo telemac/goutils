@@ -3,3 +3,4 @@ deploy_plugis.sh
 event-saver
 mysql.yml
 idronebox
+postgresql.yml
