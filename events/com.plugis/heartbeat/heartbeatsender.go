@@ -5,6 +5,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/telemac/goutils/natsevents"
 	"math/rand"
+	"os"
 	"reflect"
 	"time"
 
@@ -57,9 +58,19 @@ func (svc *HeartbeatSender) Run(ctx context.Context, params ...interface{}) erro
 		return err
 	}
 
+	failureCount := 0
 	for {
-		_ = svc.SendHeartbeatEvent(ctx)
-
+		err = svc.SendHeartbeatEvent(ctx)
+		if err != nil {
+			failureCount++
+			if failureCount > 3 {
+				log.WithError(err).Error("too many consecutive heartbeat failed, exit process")
+				time.Sleep(time.Second * 3)
+				os.Exit(1)
+			}
+		} else {
+			failureCount = 0
+		}
 		waitTime := time.Second * time.Duration(svc.Period+rand.Intn(svc.RandomPeriod))
 		interrupted := task.Sleep(ctx, waitTime)
 		if interrupted {
