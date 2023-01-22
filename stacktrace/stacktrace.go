@@ -15,7 +15,7 @@ type StackTrace struct {
 }
 
 func (st StackTrace) String() string {
-	return fmt.Sprintf("File: %s, Line: %d, Function: %s", st.File, st.Line, st.Function)
+	return fmt.Sprintf("File: %s:%d, Function: %s", st.File, st.Line, st.Function)
 }
 
 // StackTraces represents a slice of StackTrace values.
