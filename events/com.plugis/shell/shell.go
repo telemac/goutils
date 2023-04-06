@@ -3,6 +3,7 @@ package shell
 import (
 	"context"
 	"errors"
+	"github.com/telemac/goutils/natsevents"
 	"github.com/telemac/goutils/net"
 	"os/exec"
 
@@ -64,9 +65,12 @@ func (svc *ShellService) eventHandler(topic string, receivedEvent *event.Event, 
 		}
 
 		svc.Logger().WithField("out", string(params.Response)).Debug("command output")
-		// nolint:errcheck
-		receivedEvent.SetData(event.ApplicationJSON, params)
-		return receivedEvent, err
+
+		responseEvent := natsevents.NewEvent("", "com.plugis.shell.response", params)
+		responseEvent.SetExtension("responsefor", receivedEvent.ID())
+		responseEvent.SetSource("com.plugis.shell")
+
+		return responseEvent, err
 
 	default:
 		svc.Logger().WithFields(logrus.Fields{
