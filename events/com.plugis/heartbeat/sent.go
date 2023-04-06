@@ -10,18 +10,19 @@ import (
 
 // ce type : com.plugis.heartbeat.Sent
 type Sent struct {
-	Hostname        string    `json:"hostname"`
-	Mac             string    `json:"mac"`
-	InternalIP      string    `json:"ip"`
-	Started         time.Time `json:"started,omitempty"`
-	Uptime          uint64    `json:"uptime,omitempty"`
-	NatsServiceName string    `json:"nats-service,omitempty"`
-	Os              string    `json:"os,omitempty"`
-	Arch            string    `json:"arch,omitempty"`
+	Hostname        string                 `json:"hostname"`
+	Mac             string                 `json:"mac"`
+	InternalIP      string                 `json:"ip"`
+	Started         time.Time              `json:"started,omitempty"`
+	Uptime          uint64                 `json:"uptime,omitempty"`
+	NatsServiceName string                 `json:"nats-service,omitempty"`
+	Os              string                 `json:"os,omitempty"`
+	Arch            string                 `json:"arch,omitempty"`
+	Meta            map[string]interface{} `json:"meta,omitempty"`
 }
 
 // NewSent creates a new sent event
-func NewSent(natsServiceName string) (*Sent, error) {
+func NewSent(natsServiceName string, meta map[string]interface{}) (*Sent, error) {
 	// get external ip
 	internalIP, err := net.GetOutboundIP()
 	if err != nil {
@@ -46,5 +47,6 @@ func NewSent(natsServiceName string) (*Sent, error) {
 		NatsServiceName: natsServiceName,
 		Os:              runtime.GOOS,
 		Arch:            runtime.GOARCH,
+		Meta:            meta,
 	}, nil
 }

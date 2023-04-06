@@ -17,11 +17,16 @@ type HeartbeatSender struct {
 	natsservice.NatsService
 	Period        int
 	RandomPeriod  int
+	Meta          map[string]interface{} // metas to send with heartbeat
 	sentEventData *Sent
 }
 
-func NewHeartbeatSender(period int, randomPeriod int) *HeartbeatSender {
-	return &HeartbeatSender{Period: period, RandomPeriod: randomPeriod}
+func NewHeartbeatSender(period int, randomPeriod int, meta map[string]interface{}) *HeartbeatSender {
+	return &HeartbeatSender{
+		Period:       period,
+		RandomPeriod: randomPeriod,
+		Meta:         meta,
+	}
 }
 
 func (svc *HeartbeatSender) Logger() *logrus.Entry {
@@ -52,7 +57,7 @@ func (svc *HeartbeatSender) Run(ctx context.Context, params ...interface{}) erro
 
 	var err error
 
-	svc.sentEventData, err = NewSent(reflect.TypeOf(*svc).String())
+	svc.sentEventData, err = NewSent(reflect.TypeOf(*svc).String(), svc.Meta)
 	if err != nil {
 		log.WithError(err).Errorf("create heartbeat.Sent event")
 		return err

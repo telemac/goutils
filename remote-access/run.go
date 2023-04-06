@@ -119,6 +119,7 @@ func (ra *RemoteAccess) Run(ctx context.Context) error {
 	servicesRepository.Start(ctx, &heartbeat.HeartbeatSender{
 		Period:       55,
 		RandomPeriod: 4,
+		Meta:         ra.config.HeartbeatMetas,
 	})
 
 	// com.plugis.shell service
