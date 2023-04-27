@@ -46,8 +46,20 @@ func (svc *AnsibleService) eventHandler(topic string, receivedEvent *event.Event
 			return nil, err
 		}
 
+		playbookTimeout := time.Second * 30
+
+		extensions := receivedEvent.Extensions()
+		timeout, ok := extensions["timeout"]
+		if ok {
+			timeoutInt, ok := timeout.(int32)
+			if ok {
+				playbookTimeout = time.Duration(timeoutInt) * time.Second
+			}
+		}
+		ctx,cancel := context.WithTimeout(context.TODO(),playbookTimeout)
+		defer cancel()
+		ctx = logger.WithLogger(ctx, svc.Logger())
 		a := ansibleutils.New()
-		ctx := logger.WithLogger(context.TODO(), svc.Logger())
 		result, err := a.RunPlaybooks(ctx, ansibleParams)
 		if err != nil {
 			svc.Logger().WithError(err).Error("run playbook")
