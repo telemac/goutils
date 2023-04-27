@@ -95,7 +95,7 @@ func (a *Ansible) RunPlaybook(ctx context.Context, base, playbookUrl, inventory 
 	}
 	// TODO : search ansible-playbook on OSX
 	if runtime.GOOS == "darwin" {
-		playbook.Binary = "/Users/telemac/Library/Python/2.7/bin/ansible-playbook"
+		playbook.Binary = "/Users/telemac/Library/Python/3.9/bin/ansible-playbook"
 	}
 
 	log.WithField("playbook", locakPlaybookFile).Trace("run playbook")

@@ -10,6 +10,7 @@ import (
 	"github.com/telemac/goutils/ansibleutils"
 	"github.com/telemac/goutils/logger"
 	"github.com/telemac/goutils/natsservice"
+	"github.com/telemac/goutils/natsevents"
 	"github.com/telemac/goutils/net"
 	"time"
 )
@@ -54,6 +55,12 @@ func (svc *AnsibleService) eventHandler(topic string, receivedEvent *event.Event
 
 		//responseEvent := svc.Transport().NewEvent(receivedEvent.Type(), ".response", result)
 		//responseEvent.SetData(cloudevents.ApplicationJSON, result)
+
+		responseEvent := natsevents.NewEvent(receivedEvent.Type(), ".response", result)
+		responseEvent.SetSource("com.plugis.ansible.playbook")
+
+		return responseEvent, err
+
 
 		// recycle received event to respond
 		if result != nil {
