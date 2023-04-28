@@ -12,7 +12,6 @@ import (
 	"github.com/apenella/go-ansible/pkg/execute"
 	"github.com/apenella/go-ansible/pkg/options"
 	"github.com/apenella/go-ansible/pkg/playbook"
-	"github.com/apenella/go-ansible/pkg/stdoutcallback/results"
 )
 
 type Ansible struct {
@@ -52,25 +51,24 @@ func (a *Ansible) InstallRoles(roles string) error {
 }
 
 // RunPlaybook runs one playbook
-func (a *Ansible) RunPlaybook(ctx context.Context, base, playbookUrl, inventory string) (*results.AnsiblePlaybookJSONResults, error) {
+func (a *Ansible) RunPlaybook(ctx context.Context, base, playbookUrl, inventory string) (string, error) {
 	var err error
 
 	log := logger.FromContext(ctx, true)
 
-	res := &results.AnsiblePlaybookJSONResults{}
 	buff := new(bytes.Buffer)
 
 	httpFiles := NewHttpFiles("/tmp")
 	log.WithField("url", base+playbookUrl).Trace("get playbook file")
 	locakPlaybookFile, err := httpFiles.GetFile(base + playbookUrl)
 	if err != nil {
-		return res, fmt.Errorf("get playbook file : %w", err)
+		return "", fmt.Errorf("get playbook file : %w", err)
 	}
 
 	log.WithField("url", base+inventory).Trace("get inventory file")
 	localInventoryFile, err := httpFiles.GetFile(base + inventory)
 	if err != nil {
-		return res, fmt.Errorf("get inventory file : %w", err)
+		return "", fmt.Errorf("get inventory file : %w", err)
 	}
 
 	ansiblePlaybookConnectionOptions := &options.AnsibleConnectionOptions{
@@ -103,7 +101,7 @@ func (a *Ansible) RunPlaybook(ctx context.Context, base, playbookUrl, inventory 
 	err = playbook.Run(ctx)
 	if err != nil {
 		//log.WithError(err).Warn("playbook run")
-		return res, err
+		return "", err
 	}
 
 	log.WithFields(logrus.Fields{
@@ -112,15 +110,10 @@ func (a *Ansible) RunPlaybook(ctx context.Context, base, playbookUrl, inventory 
 		"error":    err,
 	}).Debug("playbook result")
 
-	res, err = results.JSONParse(buff.Bytes())
-	if err != nil {
-		return res, err
-	}
-
-	return res, err
+	return buff.String(), nil
 }
 
-func (a *Ansible) RunPlaybooks(ctx context.Context, params AnsibleParams) ([]*results.AnsiblePlaybookJSONResults, error) {
+func (a *Ansible) RunPlaybooks(ctx context.Context, params AnsibleParams) ([]string, error) {
 	log := logger.FromContext(ctx, true)
 	// Install specified packages
 	log.Debug("install packages")
@@ -135,7 +128,7 @@ func (a *Ansible) RunPlaybooks(ctx context.Context, params AnsibleParams) ([]*re
 		return nil, err
 	}
 
-	var _results []*results.AnsiblePlaybookJSONResults
+	var _results []string
 	for _, pb := range params.Playbooks {
 		res, err := a.RunPlaybook(ctx, params.Base, pb, params.Inventory)
 		_results = append(_results, res)
