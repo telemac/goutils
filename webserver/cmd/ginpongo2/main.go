@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/flosch/pongo2"
 	"github.com/gin-gonic/gin"
-	"github.com/stnc/pongo2gin"
+	"github.com/tecome/pongo2gin"
 	"github.com/telemac/goutils/files"
 	"log"
 	"net/http"
@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-//GetPongoTemplates all list
+// GetPongoTemplates all list
 func GetPongoTemplates(c *gin.Context) {
 	posts := []string{
 		"Larry Ellison",
