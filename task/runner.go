@@ -27,6 +27,11 @@ func NewRunnerRepository() *RunnerRepository {
 }
 
 func (repo *RunnerRepository) Start(ctx context.Context, runnable Runnable, params ...interface{}) *Task {
+	// check if runnable is an instance of Runnable
+	_, ok := runnable.(Runnable)
+	if !ok {
+		panic("runnable must be not nil and a task.Runnable")
+	}
 	t := new(Task)
 	t.runnable = runnable
 	t.params = params
