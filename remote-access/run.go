@@ -7,6 +7,7 @@ import (
 	"github.com/telemac/goutils/events/com.plugis/ansible"
 	"github.com/telemac/goutils/events/com.plugis/browser"
 	"github.com/telemac/goutils/events/com.plugis/heartbeat"
+	"github.com/telemac/goutils/events/com.plugis/maintenance"
 	"github.com/telemac/goutils/events/com.plugis/service"
 	"github.com/telemac/goutils/events/com.plugis/shell"
 	"github.com/telemac/goutils/natsservice"
@@ -116,11 +117,15 @@ func (ra *RemoteAccess) Run(ctx context.Context) error {
 	servicesRepository.Start(ctx, selfInstallService)
 
 	// start heartbeat service
-	servicesRepository.Start(ctx, &heartbeat.HeartbeatSender{
+	heartbeatService := &heartbeat.HeartbeatSender{
 		Period:       55,
 		RandomPeriod: 4,
 		Meta:         ra.config.HeartbeatMetas,
-	})
+	}
+	servicesRepository.Start(ctx, heartbeatService)
+
+	maintenanceService := maintenance.NewMaintenanceService(ra.config.MaintenanceServiceConfig, heartbeatService)
+	servicesRepository.Start(ctx, maintenanceService)
 
 	// com.plugis.shell service
 	servicesRepository.Start(ctx, &shell.ShellService{})

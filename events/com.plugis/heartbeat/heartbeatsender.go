@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"os"
 	"reflect"
+	"sync"
 	"time"
 
 	"github.com/telemac/goutils/natsservice"
@@ -18,6 +19,7 @@ type HeartbeatSender struct {
 	Period        int
 	RandomPeriod  int
 	Meta          map[string]interface{} // metas to send with heartbeat
+	metaMutex     sync.RWMutex
 	sentEventData *Sent
 }
 
@@ -31,6 +33,26 @@ func NewHeartbeatSender(period int, randomPeriod int, meta map[string]interface{
 
 func (svc *HeartbeatSender) Logger() *logrus.Entry {
 	return svc.NatsService.Logger().WithField("nats-service", reflect.TypeOf(*svc).String())
+}
+
+func (svc *HeartbeatSender) AddMeta(key string, value interface{}, send bool) error {
+	svc.metaMutex.Lock()
+	defer svc.metaMutex.Unlock()
+	svc.Meta[key] = value
+	if send {
+		return svc.SendHeartbeatEvent(context.Background())
+	}
+	return nil
+}
+
+func (svc *HeartbeatSender) RemoveMeta(key string, send bool) error {
+	svc.metaMutex.Lock()
+	defer svc.metaMutex.Unlock()
+	delete(svc.Meta, key)
+	if send {
+		return svc.SendHeartbeatEvent(context.Background())
+	}
+	return nil
 }
 
 func (svc *HeartbeatSender) SendHeartbeatEvent(ctx context.Context) error {
