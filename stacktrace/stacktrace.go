@@ -15,7 +15,13 @@ type StackTrace struct {
 }
 
 func (st StackTrace) String() string {
-	return fmt.Sprintf("File: %s:%d, Function: %s", st.File, st.Line, st.Function)
+	// if st.File contains github.com, remove left part of string
+	file := st.File
+	githubIdx := strings.Index(file, "github.com")
+	if githubIdx > 0 {
+		file = st.File[githubIdx:]
+	}
+	return fmt.Sprintf("File: %s:%d, Function: %s", file, st.Line, st.Function)
 }
 
 // StackTraces represents a slice of StackTrace values.
