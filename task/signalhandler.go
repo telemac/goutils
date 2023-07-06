@@ -84,5 +84,7 @@ func NewCancellableContextWithLog(maxCancelTimeout time.Duration, logLevel strin
 	ctx, cancel = NewCancellableContext(maxCancelTimeout)
 	// create logger
 	log = logger.New(logLevel, fields)
+	// add logger to context
+	ctx = logger.WithLogger(ctx, log)
 	return
 }
