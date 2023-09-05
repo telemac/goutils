@@ -121,6 +121,9 @@ func main() {
 	servicesRepository.Start(ctx, &heartbeat.HeartbeatSender{
 		Period:       55,
 		RandomPeriod: 4,
+		Meta: map[string]interface{}{
+			"version": "0.0.2",
+		},
 	})
 
 	// com.plugis.shell service
