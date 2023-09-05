@@ -59,10 +59,10 @@ func (svc *ShellService) eventHandler(topic string, receivedEvent *event.Event, 
 
 		out, err := cmd.CombinedOutput()
 		params.Response, params.Error = string(out), err
-		if params.Error != nil {
-			svc.Logger().WithError(err).WithField("command", params.Command).Warn("run command")
-			return nil, err
-		}
+		//if params.Error != nil {
+		//	svc.Logger().WithError(err).WithField("command", params.Command).Warn("run command")
+		//	return nil, err
+		//}
 
 		svc.Logger().WithField("out", string(params.Response)).Debug("command output")
 
