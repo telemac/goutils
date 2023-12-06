@@ -37,9 +37,9 @@ func (st StackTraces) String() string {
 }
 
 // GetCaller returns a StackTrace value representing the file, line, and function name for the caller of the function that calls GetCaller.
-func GetCaller() StackTrace {
+func GetCaller(skip int) StackTrace {
 	// Get the file and line number of the caller's caller.
-	_, file, line, _ := runtime.Caller(2)
+	_, file, line, _ := runtime.Caller(skip)
 
 	// Parse the function name from the file path.
 	function := path.Base(file)
