@@ -56,6 +56,26 @@ func (ub *UDPBroadcaster) Broadcast(databram []byte) error {
 	return nil
 }
 
+// Unicast sends an udp datagram to a specific address
+func (ub *UDPBroadcaster) Unicast(destAddr string, databram []byte) error {
+	if ub.listener == nil {
+		return errors.New("listener not initialized")
+	}
+	addr, err := reuse.ResolveAddr("udp", destAddr+":"+strconv.Itoa(ub.port))
+
+	if err != nil {
+		return err
+	}
+	n, err := ub.listener.WriteTo(databram, addr)
+	if err != nil {
+		return err
+	}
+	if n != len(databram) {
+		return errors.New("partial send")
+	}
+	return nil
+}
+
 func (ub *UDPBroadcaster) Read(timeout time.Duration) (*UDPDatagram, error) {
 	err := ub.listener.SetReadDeadline(time.Now().Add(timeout))
 	if err != nil {
