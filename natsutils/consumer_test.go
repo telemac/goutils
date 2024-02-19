@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/stretchr/testify/assert"
-	"github.com/telemac/megalarm/pkg/cli"
+	"github.com/telemac/goutils/cli"
 	"testing"
 	"time"
 )
