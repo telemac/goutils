@@ -55,5 +55,5 @@ func (m *Measurement) GetThroughput() Result {
 
 // Log sneds the output to log, prefixed with msg
 func (r Result) Log(msg string) {
-	log.Printf("%s : throughput = %f, %d interatios in %s", msg, r.IterationsPerSecond, r.Iterations, r.Duration)
+	log.Printf("%s : throughput = %f, %d iterations in %s", msg, r.IterationsPerSecond, r.Iterations, r.Duration)
 }
