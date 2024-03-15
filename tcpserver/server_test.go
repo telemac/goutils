@@ -45,8 +45,6 @@ func (c *MyConnectionHandler) HandleConnection(ctx context.Context, connection C
 			return err
 		}
 	}
-
-	return nil
 }
 
 func TestNewServer(t *testing.T) {

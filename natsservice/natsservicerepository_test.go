@@ -50,7 +50,6 @@ func (svc *NatsServiceSample) Run(ctx context.Context, params ...interface{}) er
 			return nil
 		}
 	}
-	return nil
 }
 
 func TestNewNatsServiceRepository(t *testing.T) {
