@@ -21,13 +21,13 @@ func TestConnect(t *testing.T) {
 		ServerURL: "tcp://colorbeam:1883",
 		ClientID:  "mqtttest",
 		InitialSubscriptions: &paho.Subscribe{
-			Subscriptions: map[string]paho.SubscribeOptions{
-				"colorbeam/loads":                 {QoS: 1},
-				"colorbeam/building":              {QoS: 1},
-				"colorbeam/drivers":               {QoS: 1},
-				"colorbeam/calibrations":          {QoS: 1},
-				"colorbeam/persist":               {QoS: 1},
-				"colorbeam/dmx_serial/+/universe": {QoS: 1},
+			Subscriptions: []paho.SubscribeOptions{
+				{Topic: "colorbeam/loads", QoS: 1},
+				{Topic: "colorbeam/building", QoS: 1},
+				{Topic: "colorbeam/drivers", QoS: 1},
+				{Topic: "colorbeam/calibrations", QoS: 1},
+				{Topic: "colorbeam/persist", QoS: 1},
+				{Topic: "colorbeam/dmx_serial/+/universe", QoS: 1},
 			},
 		},
 	})

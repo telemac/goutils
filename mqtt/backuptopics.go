@@ -16,11 +16,12 @@ func BackupTopics(ctx context.Context, server string, topics []string) (TopicsBa
 
 	topicsBackup := make(TopicsBackup)
 
-	var subscriptions = make(map[string]paho.SubscribeOptions)
+	var subscriptions []paho.SubscribeOptions
 	for _, topic := range topics {
-		subscriptions[topic] = paho.SubscribeOptions{
-			QoS: 1,
-		}
+		subscriptions = append(subscriptions, paho.SubscribeOptions{
+			Topic: topic,
+			QoS:   1,
+		})
 	}
 
 	mqttClient := NewMqttClient(MqttParams{
