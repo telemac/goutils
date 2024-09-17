@@ -9,8 +9,8 @@ import (
 
 // NatsUrls holds the URLs of the NATS servers.
 type NatsUrls struct {
-	//Servers []string `help:"NATS server URLs." short:"s" default:"wss://megalarm:megalarm@nats.megalarm.fr:443"`
-	Servers []string `help:"NATS server URLs." short:"s" default:"nats://nats:4222"`
+	//Servers []string `help:"NATS server URLs." short:"s" default:"wss://user:pass@nats.domain.com:443"`
+	Servers []string `help:"NATS server URLs." short:"s" default:"nats://localhost:4222"`
 }
 
 // NatsUser holds the user to connect to a NATS server.
@@ -21,6 +21,11 @@ type NatsUser struct {
 // NatsPass holds the password to connect to a NATS server.
 type NatsPass struct {
 	Pass string `help:"NATS server password." short:"p" default:""`
+}
+
+// NatsContext holds the context to connect to a NATS server, (empty string for default context	)
+type NatsContext struct {
+	Context string `help:"NATS context." short:"c" default:""`
 }
 
 // NatsConfig is a configuration structure for NATS.

@@ -14,3 +14,4 @@ event-sender -type 'com.plugis.shell.command' -data '{"command": ["hostname"]}' 
 
 ## restart remote-access service
 event-sender -server "nats://nats1.plugis.com:443" -type 'com.plugis.shell.command' -data '{"command": ["sh","-c","sudo service remote-access restart"]}' -topic "com.plugis.shell.2C:94:64:02:4C:A3" -timeout 5 -request
+
