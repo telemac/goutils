@@ -11,8 +11,8 @@ require (
 
 require (
 	github.com/tevino/abool v1.2.0 // indirect
-	golang.org/x/net v0.29.0 // indirect
-	golang.org/x/sys v0.25.0 // indirect
+	golang.org/x/net v0.30.0 // indirect
+	golang.org/x/sys v0.26.0 // indirect
 )
 
 replace github.com/telemac/goutils => ../../../goutils
