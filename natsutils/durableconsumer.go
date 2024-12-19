@@ -17,11 +17,12 @@ type JetstreamConsumer struct {
 }
 
 type JetstreamConsumerConfig struct {
-	StreamName     string   // stream from which to consume
-	ConsumerName   string   // consumer name
-	Description    string   // consumer description
-	Durable        bool     // is a durable consumer
-	FilterSubjects []string // subjects received by the consumer
+	StreamName       string   // stream from which to consume
+	ConsumerName     string   // consumer name
+	Description      string   // consumer description
+	Durable          bool     // is a durable consumer
+	FilterSubjects   []string // subjects received by the consumer
+	JsConsumerConfig *jetstream.ConsumerConfig
 }
 
 func NewJetstreamConsumer(ctx context.Context, nc *nats.Conn, config JetstreamConsumerConfig) (*JetstreamConsumer, error) {
@@ -38,16 +39,19 @@ func NewJetstreamConsumer(ctx context.Context, nc *nats.Conn, config JetstreamCo
 		return jetstreamConsumer, fmt.Errorf("get stream : %w", err)
 	}
 
-	consumerConfig := jetstream.ConsumerConfig{
-		Name:           jetstreamConsumer.config.ConsumerName,
-		Description:    jetstreamConsumer.config.Description,
-		AckPolicy:      jetstream.AckExplicitPolicy,
-		FilterSubjects: jetstreamConsumer.config.FilterSubjects,
-	}
-	if jetstreamConsumer.config.Durable {
-		consumerConfig.Durable = "TEST-DURABLE"
+	var consumerConfig jetstream.ConsumerConfig
+	if jetstreamConsumer.config.JsConsumerConfig != nil {
+		consumerConfig = *jetstreamConsumer.config.JsConsumerConfig
 	} else {
-		// TODO : adapt parameters for ephemeral consumer
+		consumerConfig.Name = jetstreamConsumer.config.ConsumerName
+		consumerConfig.Description = jetstreamConsumer.config.Description
+		consumerConfig.AckPolicy = jetstream.AckExplicitPolicy
+		consumerConfig.FilterSubjects = jetstreamConsumer.config.FilterSubjects
+		if jetstreamConsumer.config.Durable {
+			consumerConfig.Durable = "TEST-DURABLE"
+		} else {
+			// TODO : adapt parameters for ephemeral consumer
+		}
 	}
 
 	jetstreamConsumer.consumer, err = jetstreamConsumer.stream.CreateOrUpdateConsumer(ctx, consumerConfig)
