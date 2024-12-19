@@ -9,6 +9,7 @@ import (
 	"github.com/kardianos/osext"
 	log "github.com/sirupsen/logrus"
 	"io"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/exec"
@@ -72,6 +73,7 @@ func (su *SelfUpdater) NeedsUpdate() (bool, error) {
 	if err != nil {
 		return false, fmt.Errorf("get local md5 : %w", err)
 	}
+	slog.Info("compare md5 for update", "remote", remoteMD5, "local", localMD5)
 	return !strings.EqualFold(localMD5, remoteMD5), nil
 	// return strings.ToUpper(localMD5) != strings.ToUpper(remoteMD5), nil
 }

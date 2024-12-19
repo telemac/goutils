@@ -43,7 +43,7 @@ func (sh *SignalHandler) Run(ctx context.Context, params ...interface{}) error {
 	}
 
 	signaled := make(chan os.Signal, 1)
-	signal.Notify(signaled, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(signaled, os.Interrupt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	go func() {
 		defer sh.cancelFunc()
 		select {
