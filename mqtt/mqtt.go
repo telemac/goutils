@@ -28,7 +28,8 @@ type MqttClient struct {
 
 func NewMqttClient(params MqttParams) *MqttClient {
 	return &MqttClient{
-		params: params,
+		params:           params,
+		incomingMessages: make(chan *paho.Publish, 1000),
 	}
 }
 
@@ -129,7 +130,7 @@ func (mqttClient *MqttClient) Connect(ctx context.Context) error {
 		return err
 	}
 
-	mqttClient.incomingMessages = make(chan *paho.Publish, 1000)
+	//mqttClient.incomingMessages = make(chan *paho.Publish, 1000)
 
 	err = mqttClient.connectionManager.AwaitConnection(ctx)
 	if err != nil {

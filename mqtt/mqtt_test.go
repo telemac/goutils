@@ -36,10 +36,14 @@ func TestConnect(t *testing.T) {
 	logrus.WithError(err).Info("connected")
 
 	err = mqttClient.Subscribe(ctx, &paho.Subscribe{
-		Subscriptions: map[string]paho.SubscribeOptions{
-			"colorbeam/load/+/status": {QoS: 1},
+		Subscriptions: []paho.SubscribeOptions{
+			{Topic: "colorbeam/load/+/status", QoS: 1},
 		},
+		//Subscriptions: map[string]paho.SubscribeOptions{
+		//	"colorbeam/load/+/status": {QoS: 1},
+		//},
 	})
+	// No error check here
 
 	cancelled := false
 	for !cancelled {
@@ -48,10 +52,14 @@ func TestConnect(t *testing.T) {
 			logrus.WithField("message", msg).Debug("mqtt service received message")
 			if msg.Topic == "colorbeam/load/store" {
 				err = mqttClient.Subscribe(ctx, &paho.Subscribe{
-					Subscriptions: map[string]paho.SubscribeOptions{
-						"colorbeam/load/+/status":     {QoS: 1},
-						"colorbeam/load/+/transition": {QoS: 1},
+					Subscriptions: []paho.SubscribeOptions{
+						{Topic: "colorbeam/load/+/status", QoS: 1},
+						{Topic: "colorbeam/load/+/transition", QoS: 1},
 					},
+					//Subscriptions: map[string]paho.SubscribeOptions{
+					//	"colorbeam/load/+/status":     {QoS: 1},
+					//	"colorbeam/load/+/transition": {QoS: 1},
+					//},
 				})
 			}
 		case <-mqttClient.Done():
