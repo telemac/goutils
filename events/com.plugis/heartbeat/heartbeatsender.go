@@ -18,12 +18,12 @@ type HeartbeatSender struct {
 	natsservice.NatsService
 	Period        int
 	RandomPeriod  int
-	Meta          map[string]interface{} // metas to send with heartbeat
+	Meta          map[string]any // metas to send with heartbeat
 	metaMutex     sync.RWMutex
 	sentEventData *Sent
 }
 
-func NewHeartbeatSender(period int, randomPeriod int, meta map[string]interface{}) *HeartbeatSender {
+func NewHeartbeatSender(period int, randomPeriod int, meta map[string]any) *HeartbeatSender {
 	return &HeartbeatSender{
 		Period:       period,
 		RandomPeriod: randomPeriod,
@@ -32,10 +32,10 @@ func NewHeartbeatSender(period int, randomPeriod int, meta map[string]interface{
 }
 
 func (svc *HeartbeatSender) Logger() *logrus.Entry {
-	return svc.NatsService.Logger().WithField("nats-service", reflect.TypeOf(svc).Elem().String())
+	return svc.NatsService.Logger().WithField("nats-service", reflect.TypeFor[HeartbeatSender]().String())
 }
 
-func (svc *HeartbeatSender) AddMeta(key string, value interface{}, send bool) error {
+func (svc *HeartbeatSender) AddMeta(key string, value any, send bool) error {
 	svc.metaMutex.Lock()
 	defer svc.metaMutex.Unlock()
 	svc.Meta[key] = value
@@ -72,14 +72,14 @@ func (svc *HeartbeatSender) SendHeartbeatEvent(ctx context.Context) error {
 	return err
 }
 
-func (svc *HeartbeatSender) Run(ctx context.Context, params ...interface{}) error {
+func (svc *HeartbeatSender) Run(ctx context.Context, params ...any) error {
 	log := svc.Logger()
 	log.Debug("heartbeat sender started")
 	defer log.Debug("heartbeat sender ended")
 
 	var err error
 
-	svc.sentEventData, err = NewSent(reflect.TypeOf(svc).Elem().String(), svc.Meta)
+	svc.sentEventData, err = NewSent(reflect.TypeFor[HeartbeatSender]().String(), svc.Meta)
 	if err != nil {
 		log.WithError(err).Errorf("create heartbeat.Sent event")
 		return err

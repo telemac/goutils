@@ -2,7 +2,7 @@ package remote_access
 
 import (
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/net/context"
+	"context"
 	"testing"
 	"time"
 )
