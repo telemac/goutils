@@ -32,7 +32,7 @@ func NewHeartbeatSender(period int, randomPeriod int, meta map[string]interface{
 }
 
 func (svc *HeartbeatSender) Logger() *logrus.Entry {
-	return svc.NatsService.Logger().WithField("nats-service", reflect.TypeOf(*svc).String())
+	return svc.NatsService.Logger().WithField("nats-service", reflect.TypeOf(svc).Elem().String())
 }
 
 func (svc *HeartbeatSender) AddMeta(key string, value interface{}, send bool) error {
@@ -79,7 +79,7 @@ func (svc *HeartbeatSender) Run(ctx context.Context, params ...interface{}) erro
 
 	var err error
 
-	svc.sentEventData, err = NewSent(reflect.TypeOf(*svc).String(), svc.Meta)
+	svc.sentEventData, err = NewSent(reflect.TypeOf(svc).Elem().String(), svc.Meta)
 	if err != nil {
 		log.WithError(err).Errorf("create heartbeat.Sent event")
 		return err

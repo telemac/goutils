@@ -30,7 +30,6 @@ func (svc *testService) Run(ctx context.Context, params ...interface{}) error {
 			return nil
 		}
 	}
-	return nil
 }
 
 func TestRunnerRepository_Run(t *testing.T) {

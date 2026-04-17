@@ -13,7 +13,7 @@ func TestRemoteAccess_Run(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	remoteAccess := NewRemoteAccess(RemoteAccessconfig{
+	remoteAccess := NewRemoteAccess(Config{
 		BaseUpdateUrl: "https://update.plugis.com/",
 	})
 	err := remoteAccess.Run(ctx)

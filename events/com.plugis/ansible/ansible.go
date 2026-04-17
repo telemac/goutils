@@ -3,9 +3,7 @@ package ansible
 import (
 	"context"
 	"fmt"
-	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/cloudevents/sdk-go/v2/event"
-	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 	"github.com/telemac/goutils/ansibleutils"
 	"github.com/telemac/goutils/logger"
@@ -72,19 +70,6 @@ func (svc *AnsibleService) eventHandler(topic string, receivedEvent *event.Event
 		responseEvent.SetSource("com.plugis.ansible.playbook")
 
 		return responseEvent, err
-
-
-		// recycle received event to respond
-		if result != nil {
-			receivedEvent.SetExtension("response", "result[0]")
-		}
-
-		receivedEvent.SetTime(time.Now())
-		receivedEvent.SetID(uuid.NewString())
-		mac, _ := net.GetMACAddress()
-		_ = receivedEvent.SetData(cloudevents.ApplicationJSON, "ma réponse de "+mac)
-
-		return receivedEvent, err
 	default:
 		return nil, fmt.Errorf("unknown event type %s", receivedEvent.Type())
 	}

@@ -71,8 +71,9 @@ func TestConnect(t *testing.T) {
 	<-mqttClient.Done()
 	logrus.Info("mqttClient.Done")
 
-	ctx, _ = context.WithTimeout(context.TODO(), time.Second*2)
-	mqttClient.Disconnect(ctx)
+	disconnectCtx, disconnectCancel := context.WithTimeout(context.TODO(), time.Second*2)
+	defer disconnectCancel()
+	mqttClient.Disconnect(disconnectCtx)
 	mqttClient.Close()
 
 	logrus.WithError(err).Info("closed")
